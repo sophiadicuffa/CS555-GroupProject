@@ -1,0 +1,176 @@
+0 HEAD
+0 NOTE Sophia DiCuffa, three generations of a family with three generations of relatives, Someone who was widowed and remarried (Mary), half-sister through remarriage (Cara & Sophia)
+1 SOUR Family Echo
+2 WWW http://www.familyecho.com/
+1 FILE My Family
+1 DATE 10 SEP 2023
+1 DEST ANSTFILE
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE-LINKED
+1 SUBM @I1@
+2 NAME Sophia DiCuffa
+1 SUBN
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME Sophia /DiCuffa/
+2 GIVN Sophia
+2 SURN DiCuffa
+2 _MARNM DiCuffa
+1 SEX F
+1 BIRT
+2 DATE 6 JUN 2002
+1 FAMC @F1@
+0 @I2@ INDI
+1 NAME Delio /DiCuffa/
+2 GIVN Delio
+2 SURN DiCuffa
+2 _MARNM DiCuffa
+1 SEX M
+1 BIRT
+2 DATE 3 MAR 1973
+1 FAMS @F1@
+1 FAMS @F2@
+1 FAMC @F3@
+0 @I3@ INDI
+1 NAME Loraine /Brandwood/
+2 GIVN Loraine
+2 SURN Brandwood
+2 _MARNM DiCuffa
+1 SEX F
+1 BIRT
+2 DATE 10 OCT 1973
+1 FAMS @F1@
+1 FAMC @F4@
+0 @I4@ INDI
+1 NAME Maria Teresa /Perrazo/
+2 GIVN Maria Teresa
+2 SURN Perrazo
+2 _MARNM DiCuffa
+1 SEX F
+1 BIRT
+2 DATE 7 OCT 1940
+1 FAMS @F3@
+1 FAMS @F5@
+0 @I5@ INDI
+1 NAME Amelia /DiCuffa/
+2 GIVN Amelia
+2 SURN DiCuffa
+2 _MARNM DiCuffa
+1 SEX F
+1 BIRT
+2 DATE 3 MAY 2006
+1 FAMC @F1@
+0 @I6@ INDI
+1 NAME John /Brandwood/
+2 GIVN John
+2 SURN Brandwood
+2 _MARNM Brandwood
+1 SEX M
+1 BIRT
+2 DATE 6 JUN 1933
+1 FAMS @F4@
+0 @I7@ INDI
+1 NAME Mary /Brandwood/
+2 GIVN Mary
+2 SURN Brandwood
+2 _MARNM Brandwood
+1 SEX F
+1 BIRT
+2 DATE 4 JUN 1933
+1 FAMS @F4@
+1 FAMS @F6@
+0 @I8@ INDI
+1 NAME Delio /DiCuffa/
+2 GIVN Delio
+2 SURN DiCuffa
+2 _MARNM DiCuffa
+1 SEX M
+1 BIRT
+2 DATE 6 NOV 1940
+1 FAMS @F3@
+0 @I9@ INDI
+1 NAME Jack /Kelly/
+2 GIVN Jack
+2 SURN Kelly
+2 _MARNM Kelly
+1 SEX M
+1 BIRT
+2 DATE 6 MAR 1933
+1 DEAT Y
+2 DATE 4 MAY 1955
+1 FAMS @F6@
+0 @I10@ INDI
+1 NAME Elizabeth /Frank/
+2 GIVN Elizabeth
+2 SURN Frank
+2 _MARNM Frank
+1 SEX F
+1 BIRT
+2 DATE 9 APR 1977
+1 FAMS @F2@
+0 @I11@ INDI
+1 NAME Kara /Frank/
+2 GIVN Kara
+2 SURN Frank
+2 _MARNM Frank
+1 SEX F
+1 BIRT
+2 DATE 4 MAR 1988
+1 FAMC @F2@
+0 @F1@ FAM
+1 HUSB @I2@
+1 WIFE @I3@
+1 CHIL @I1@
+1 CHIL @I5@
+1 MARR
+2 DATE 3 JUL 1999
+2 PLAC Long Island
+1 _CURRENT Y
+1 _PRIMARY Y
+0 @F2@ FAM
+1 HUSB @I2@
+1 WIFE @I10@
+1 CHIL @I11@
+1 MARR
+2 DATE 8 MAR 1989
+2 PLAC Long Island
+1 DIV
+2 DATE 6 FEB 1990
+1 _CURRENT N
+1 _PRIMARY N
+0 @F3@ FAM
+1 HUSB @I8@
+1 WIFE @I4@
+1 CHIL @I2@
+1 _CURRENT N
+1 _PRIMARY N
+0 @F5@ FAM
+1 WIFE @I4@
+1 EVEN
+2 TYPE Widowed
+1 EVEN
+2 TYPE Ending
+1 _CURRENT N
+1 _PRIMARY N
+0 @F4@ FAM
+1 HUSB @I6@
+1 WIFE @I7@
+1 CHIL @I3@
+1 MARR
+2 DATE 8 MAR 1961
+2 PLAC Brooklyn
+1 _CURRENT Y
+1 _PRIMARY Y
+0 @F6@ FAM
+1 HUSB @I9@
+1 WIFE @I7@
+1 EVEN
+2 TYPE Widowed
+2 DATE 4 APR 1952
+1 EVEN
+2 TYPE Ending
+2 DATE 4 MAY 1955
+1 _CURRENT N
+1 _PRIMARY N
+0 TRLR
