@@ -35,20 +35,23 @@ def process_line(line):
     level = int(parts[0]) # 0, 1 ,2 
     tag = parts[1] # INDI, FAM, etc.
 
+    if len(parts) > 2:
+        special_tag = parts[2]
+    else:
+        special_tag = ''
+
     if level == 0:
-        if tag == 'INDI':
+        if special_tag == 'INDI':
             if current_person:
                 people.append(current_person)
             current_person = {}  # Initialize a new person dictionary
-        elif tag == 'FAM':
+        elif special_tag == 'FAM':
             if current_family:
                 families.append(current_family)
             current_family = {}
     elif level == 1:
         if tag == 'NAME':
             current_person['NAME'] = ' '.join(parts[2:])
-            if current_person not in people:
-               people.append(current_person)
         elif tag == 'SEX':
             current_person['SEX'] = parts[2]
         elif tag == 'BIRT':
@@ -78,8 +81,9 @@ with open('test.ged', 'r') as gedcom_file:
     for line in gedcom_file:
         process_line(line)
 
-#if current_person not in people:
- #   people.append(current_person) 
+# add last person
+if current_person:
+    people.append(current_person)
 
 
 # table to print individuals 
