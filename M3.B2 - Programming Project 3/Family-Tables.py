@@ -48,7 +48,7 @@ def process_line(line):
         elif special_tag == 'FAM':
             if current_family:
                 families.append(current_family)
-            current_family = {}
+            current_family = {}  # Initialize a new family dictionary
     elif level == 1:
         if tag == 'NAME':
             current_person['NAME'] = ' '.join(parts[2:])
@@ -85,6 +85,10 @@ with open('test.ged', 'r') as gedcom_file:
 if current_person:
     people.append(current_person)
 
+# add last family
+if current_family:
+    families.append(current_family)
+
 
 # table to print individuals 
 print("people:")
@@ -98,5 +102,26 @@ for person in people:
     age = calculate_age(birthday, death_date)
     status = "Alive" if not death_date else "Dead"
     print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10}".format(indi_id, name, sex, birthday, age, status))
+
+# Table to print families - does not work rn 
+print("\nFamilies:")
+print("{:<10} {:<15} {:<15} {:<15} {:<20} {:<20} {:<30}".format("ID", "Married Date", "Divorced Date", "Husband Name", "Wife Name", "Children", "Status"))
+for family in families:
+    fam_id = family.get('FAM', '')
+    married_date = family.get('MARR', {}).get('DATE', '')
+    divorced_date = family.get('DIV', {}).get('DATE', 'N/A')
+    
+    husband_id = family.get('HUSB', '')
+    husband_name = next((person.get('NAME', '') for person in people if person.get('INDI', '') == husband_id), '')
+    
+    wife_id = family.get('WIFE', '')
+    wife_name = next((person.get('NAME', '') for person in people if person.get('INDI', '') == wife_id), '')
+    
+    children_ids = family.get('CHIL', [])
+    children_names = ', '.join([next((person.get('NAME', '') for person in people if person.get('INDI', '') == child_id), '') for child_id in children_ids])
+    
+    status = "Married" if not divorced_date or divorced_date == 'N/A' else "Divorced"
+    
+    print("{:<10} {:<15} {:<15} {:<15} {:<20} {:<20} {:<30}".format(fam_id, married_date, divorced_date, husband_name, wife_name, children_names, status))
 
 
