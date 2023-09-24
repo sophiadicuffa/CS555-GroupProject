@@ -44,6 +44,7 @@ def process_line(line):
         if special_tag == 'INDI':
             if current_person:
                 people.append(current_person)
+                current_person['INDI'] = parts[1]
             current_person = {}  # Initialize a new person dictionary
         elif special_tag == 'FAM':
             if current_family:
