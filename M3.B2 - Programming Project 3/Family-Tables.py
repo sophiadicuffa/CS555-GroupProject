@@ -176,44 +176,46 @@ people = sorted(people, key=lambda k: k['INDI'])
 
 families = sorted(families, key=lambda k: k['FAM'])
 
+# Function to find children for a family
+def find_children(family_id):
+    return [person for person in people if person.get('FAMC') == family_id]
 
+# Function to find parents for a family
+def find_parents(family_id):
+    return [person for person in people if family_id in person.get('FAMS', [])]
 
-print("people:")
-print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10} {:<20}".format("ID", "Name", "Sex", "Birthday", "Age", "Spouse", "Parents"))
+print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10} {:<20}".format("ID", "Name", "Sex", "Birthday", "Age", "Spouse", "Parent"))
 
+# Iterate through the individuals
 for person in people:
     indi_id = person.get('INDI', '')
     name = person.get('NAME', '')
     sex = person.get('SEX', '')
     birthday = person.get('BIRTH', {}).get('DATE', '')
     death_date = person.get('DEATH', {}).get('DATE', '')
+    age = calculate_age(birthday, death_date)
     
     # Find the family tag they belong to (as husband or wife)
-    spouse_tag = ''
+    spouse_tag = 'N/A'
+    parent_tag = 'N/A'
+
+    if 'FAMC' in person:
+        family_id = person['FAMC']
+        parents = find_parents(family_id)
+        parent_names = [parent.get('NAME', '') for parent in parents]
+        parent_tag = family_id
+    
     for family in families:
+        fam_id = family.get('FAM', '')
+
         husband_id = family.get('HUSB', '')
         wife_id = family.get('WIFE', '')
         if indi_id == husband_id or indi_id == wife_id:
             spouse_tag = family.get('FAM', '')
             break
 
-    # Find the family tag they belong to (as child)
-    child_tag = ''
-    for family in families:
-        dad_id = family.get('CHIL', '')
-        if indi_id == dad_id:
-            child_tag = family.get('FAM', '')
-            break
+    print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10} {:<20}".format(indi_id, name, sex, birthday, age, spouse_tag, parent_tag))
 
-    age = calculate_age(birthday, death_date)
-    
-    print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10}".format(indi_id, name, sex, birthday, age, spouse_tag, child_tag))
-
-
-
-# Function to find children for a family
-def find_children(family_id):
-    return [person for person in people if person.get('FAMC') == family_id]
 
 # Table to print families
 print("\nFamilies:")
@@ -239,7 +241,7 @@ for family in families:
     children = find_children(fam_id)
     
     # Format children names
-    children_names = ', '.join([child.get('NAME', '') for child in children])
+    children_names = ', '.join([child.get('INDI', '') for child in children])
     
     status = "Married" if not divorced_date or divorced_date == 'N/A' else "Divorced"
     
