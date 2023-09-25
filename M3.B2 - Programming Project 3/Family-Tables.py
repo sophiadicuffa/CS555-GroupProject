@@ -104,12 +104,15 @@ for person in people:
     status = "Alive" if not death_date else "Dead"
     print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10}".format(indi_id, name, sex, birthday, age, status))
 
-# Table to print families - does not work rn 
+# Table to print families // Need to figure out how to extract marriage date and children names
 print("\nFamilies:")
 print("{:<10} {:<15} {:<15} {:<15} {:<20} {:<20} {:<30}".format("ID", "Married Date", "Divorced Date", "Husband Name", "Wife Name", "Children", "Status"))
 for family in families:
     fam_id = family.get('FAM', '')
-    married_date = family.get('MARR', {}).get('DATE', '')
+    
+    # Handle the 'MARR' date under 'DATE' tag
+    marriage_date = family.get('MARR', {}).get('DATE', 'N/A')
+    
     divorced_date = family.get('DIV', {}).get('DATE', 'N/A')
     
     husband_id = family.get('HUSB', '')
@@ -123,6 +126,4 @@ for family in families:
     
     status = "Married" if not divorced_date or divorced_date == 'N/A' else "Divorced"
     
-    print("{:<10} {:<15} {:<15} {:<15} {:<20} {:<20} {:<30}".format(fam_id, married_date, divorced_date, husband_name, wife_name, children_names, status))
-
-
+    print("{:<10} {:<15} {:<15} {:<15} {:<20} {:<20} {:<30}".format(fam_id, marriage_date, divorced_date, husband_name, wife_name, children_names, status))
