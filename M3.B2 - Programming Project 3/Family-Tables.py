@@ -75,14 +75,18 @@ def process_line(line):
         elif tag == 'WIFE':
             current_family['WIFE'] = parts[2]
         elif tag == 'MARR':
-            current_family['MARR'] = {} # this is added, checked
+            current_family['MARR'] = {}
         elif tag == 'DIV':
             current_family['DIV'] = {}
         elif tag == 'CHIL':
             current_family['CHIL'] = parts[2]
     elif level == 2:
-        if 'BIRTH' in current_person and tag == 'DATE':
-            current_person['BIRTH']['DATE'] = ' '.join(parts[2:]) # birthdates are added, checked
+        if 'DEATH' in current_person:
+            if tag == 'DATE':
+                current_person['DEATH']['DDATE'] = ' '.join(parts[2:])
+        elif 'BIRTH' in current_person:
+            if tag == 'DATE':
+                current_person['BIRTH']['BDATE'] = ' '.join(parts[2:])
         if 'MARR' in current_family and tag == 'DATE':
             current_family['MARR']['DATE'] = ' '.join(parts[2:])
             print(current_family['MARR']['DATE'])
