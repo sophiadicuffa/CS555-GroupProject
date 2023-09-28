@@ -4,11 +4,8 @@
 from datetime import datetime
 
 people = []
-
 families = []
-
 current_person = {}
-
 current_family = {}
 
 def calculate_age(birthdate, deathdate):
@@ -73,52 +70,37 @@ def process_line(line):
             current_person['FAMC'] = parts[2]
         elif tag == 'DEAT':
             current_person['DEATH'] = {}
-        elif tag == 'DATE':
-            if 'BIRTH' in current_person:
-                current_person['BIRTH']['DATE'] = ' '.join(parts[2:])
-            elif 'DEATH' in current_person:
-                current_person['DEATH']['DATE'] = ' '.join(parts[2:])
         elif tag == 'HUSB':
             current_family['HUSB'] = parts[2]
         elif tag == 'WIFE':
             current_family['WIFE'] = parts[2]
         elif tag == 'MARR':
-            current_family['MARR'] = {"DATE": ''}
+            current_family['MARR'] = {} # this is added, checked
+        elif tag == 'DIV':
+            current_family['DIV'] = {}
+        elif tag == 'CHIL':
+            current_family['CHIL'] = parts[2]
     elif level == 2:
         if 'BIRTH' in current_person and tag == 'DATE':
-            current_person['BIRTH']['DATE'] = ' '.join(parts[2:])
-        elif 'MARR' in current_family:
-            if tag == 'DATE':
-                current_family['MARR']['DATE'] = ' '.join(parts[2:])
-            elif tag == 'PLAC':
-                current_family['MARR']['PLAC'] = ' '.join(parts[2:])
-        elif tag == 'CHIL':
-            current_family.setdefault('CHIL', []).append(parts[2])
-
+            current_person['BIRTH']['DATE'] = ' '.join(parts[2:]) # birthdates are added, checked
+        if 'MARR' in current_family and tag == 'DATE':
+            current_family['MARR']['DATE'] = ' '.join(parts[2:])
+            print(current_family['MARR']['DATE'])
+        if 'DIV' in current_family and tag == 'DATE':
+            current_family['DIV']['DATE'] = ' '.join(parts[2:])
+            print(current_family['DIV']['DATE'])
 
 
 with open('test.ged', 'r') as gedcom_file:
-
     for line in gedcom_file:
-
         process_line(line)
 
-
-
 if current_person:
-
     people.append(current_person)
-
-
-
 if current_family:
-
     families.append(current_family)
 
-
-
 people = sorted(people, key=lambda k: k['INDI'])
-
 families = sorted(families, key=lambda k: k['FAM'])
 
 # Function to find children for a family
@@ -129,42 +111,37 @@ def find_children(family_id):
 def find_parents(family_id):
     return [person for person in people if family_id in person.get('FAMS', [])]
 
-print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10} {:<20}".format("ID", "Name", "Sex", "Birthday", "Age", "Spouse", "Parent"))
+# print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10} {:<20}".format("ID", "Name", "Sex", "Birthday", "Age", "Spouse", "Parent"))
 
-# Iterate through the individuals
-for person in people:
-    indi_id = person.get('INDI', '')
-    name = person.get('NAME', '')
-    sex = person.get('SEX', '')
-    birthday = person.get('BIRTH', {}).get('DATE', '')
-    death_date = person.get('DEATH', {}).get('DATE', '')
-    age = calculate_age(birthday, death_date)
+# # Iterate through the individuals
+# for person in people:
+#     indi_id = person.get('INDI', '')
+#     name = person.get('NAME', '')
+#     sex = person.get('SEX', '')
+#     birthday = person.get('BIRTH', {}).get('DATE', '')
+#     death_date = person.get('DEATH', {}).get('DATE', '')
+#     age = calculate_age(birthday, death_date)
     
-    # Find the family tag they belong to (as husband or wife)
-    spouse_tag = 'N/A'
-    parent_tag = 'N/A'
+#     # Find the family tag they belong to (as husband or wife)
+#     spouse_tag = 'N/A'
+#     parent_tag = 'N/A'
 
-    if 'FAMC' in person:
-        family_id = person['FAMC']
-        parents = find_parents(family_id)
-        parent_names = [parent.get('NAME', '') for parent in parents]
-        parent_tag = family_id
+#     if 'FAMC' in person:
+#         family_id = person['FAMC']
+#         parents = find_parents(family_id)
+#         parent_names = [parent.get('NAME', '') for parent in parents]
+#         parent_tag = family_id
     
-    for family in families:
-        fam_id = family.get('FAM', '')
+#     for family in families:
+#         fam_id = family.get('FAM', '')
 
-        husband_id = family.get('HUSB', '')
-        wife_id = family.get('WIFE', '')
-        if indi_id == husband_id or indi_id == wife_id:
-            spouse_tag = family.get('FAM', '')
-            break
+#         husband_id = family.get('HUSB', '')
+#         wife_id = family.get('WIFE', '')
+#         if indi_id == husband_id or indi_id == wife_id:
+#             spouse_tag = family.get('FAM', '')
+#             break
 
-    print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10} {:<20}".format(indi_id, name, sex, birthday, age, spouse_tag, parent_tag))
-
-def extract_date(event):
-    if 'DATE' in event:
-        return event['DATE']
-    return 'N/A'
+#     print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10} {:<20}".format(indi_id, name, sex, birthday, age, spouse_tag, parent_tag))
 
 print("\nFamilies:")
 print("{:<10} {:<15} {:<15} {:<20} {:<20} {:<15} {:<35} {:<40}".format(
@@ -172,26 +149,22 @@ print("{:<10} {:<15} {:<15} {:<20} {:<20} {:<15} {:<35} {:<40}".format(
 
 for family in families:
     fam_id = family.get('FAM', '')
-    marriage_date = family.get('MARR', {}).get('DATE', 'N/A')
-    divorced_date = extract_date(family.get('DIV', {}))
+    marriage_date = family.get('MARR', {}).get('DATE', '')
+    divorced_date = family.get('DIV', {}).get('DATE', '')
+    if not divorced_date:
+        divorced_date = "N/A"
     husband_id = family.get('HUSB', '')
     husband_name = next((person.get('NAME', '') for person in people if person.get('INDI', '') == husband_id), '')
     wife_id = family.get('WIFE', '')
     wife_name = next((person.get('NAME', '') for person in people if person.get('INDI', '') == wife_id), '')
-    
-    # Find children associated with this family
     children = find_children(fam_id)
     
     # Skip printing if the family has only one child or none
     if (not husband_id and not wife_id) or not children:
         continue
-    
-    # Format children IDs
+
     children_names = ', '.join([child.get('INDI', '') for child in children])
-    
     status = "Married" if not divorced_date or divorced_date == 'N/A' else "Divorced"
     
     print("{:<10} {:<15} {:<15} {:<20} {:<20} {:<15} {:<35} {:<40}".format(
         fam_id, marriage_date, divorced_date, husband_id, husband_name, wife_id, wife_name, children_names))
-
-
