@@ -172,10 +172,9 @@ for family in families:
     
     print("{:<10} {:<15} {:<15} {:<20} {:<20} {:<15} {:<35} {:<40}".format(
         fam_id, marriage_date, divorced_date, husband_id, husband_name, wife_id, wife_name, children_names))
-    
 
-def check_birth_before_marriage(people, families):
-    print("{:<15} {:<15} {:<20} {:<20}".format("Husband Birth", "Wife Birth", "Marriage Date", "Result"))
+def check_marriage_before_death(people, families):
+    print("{:<15} {:<15} {:<20} {:<20}".format("Husband Death", "Wife Death", "Marriage Date", "Result"))
     for family in families:
         husband_id = family.get('HUSB', '')
         wife_id = family.get('WIFE', '')
@@ -189,19 +188,19 @@ def check_birth_before_marriage(people, families):
         result = "Pass"
 
         if husband_id:
-            husband_birth_date = next((person.get('BIRTH', {}).get('BDATE', '') for person in people if person.get('INDI', '') == husband_id), '')
-            if husband_birth_date:
-                husband_birth = datetime.strptime(husband_birth_date, "%d %b %Y").strftime("%d %b %Y")
+            hus_death = next((person.get('DEATH', {}).get('DATE', '') for person in people if person.get('INDI', '') == husband_id), '')
+            if hus_death:
+                husband_birth = datetime.strptime(hus_death, "%d %b %Y").strftime("%d %b %Y")
 
         if wife_id:
-            wife_birth_date = next((person.get('BIRTH', {}).get('BDATE', '') for person in people if person.get('INDI', '') == wife_id), '')
-            if wife_birth_date:
-                wife_birth = datetime.strptime(wife_birth_date, "%d %b %Y").strftime("%d %b %Y")
+            wife_death = next((person.get('DEATH', {}).get('DATE', '') for person in people if person.get('INDI', '') == wife_id), '')
+            if wife_death:
+                wife_birth = datetime.strptime(wife_death, "%d %b %Y").strftime("%d %b %Y")
 
-        if marriage_date and husband_birth_date and wife_birth_date:
-            if datetime.strptime(husband_birth_date, "%d %b %Y") > datetime.strptime(marriage_date, "%d %b %Y") or datetime.strptime(wife_birth_date, "%d %b %Y") > datetime.strptime(marriage_date, "%d %b %Y"):
+        if marriage_date and hus_death and wife_death:
+            if datetime.strptime(hus_death, "%d %b %Y") < datetime.strptime(marriage_date, "%d %b %Y") or datetime.strptime(wife_death, "%d %b %Y") > datetime.strptime(marriage_date, "%d %b %Y"):
                 result = "Fail"
 
         print("{:<15} {:<15} {:<20} {:<20}".format(husband_birth, wife_birth, marriage_date, result))
 
-check_birth_before_marriage(people, families)
+check_marriage_before_death(people, families)
