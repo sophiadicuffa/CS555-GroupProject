@@ -115,37 +115,37 @@ def find_children(family_id):
 def find_parents(family_id):
     return [person for person in people if family_id in person.get('FAMS', [])]
 
-# print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10} {:<20}".format("ID", "Name", "Sex", "Birthday", "Age", "Spouse", "Parent"))
+print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10} {:<20}".format("ID", "Name", "Sex", "Birthday", "Age", "Spouse", "Parent"))
 
-# # Iterate through the individuals
-# for person in people:
-#     indi_id = person.get('INDI', '')
-#     name = person.get('NAME', '')
-#     sex = person.get('SEX', '')
-#     birthday = person.get('BIRTH', {}).get('DATE', '')
-#     death_date = person.get('DEATH', {}).get('DATE', '')
-#     age = calculate_age(birthday, death_date)
+# Iterate through the individuals
+for person in people:
+    indi_id = person.get('INDI', '')
+    name = person.get('NAME', '')
+    sex = person.get('SEX', '')
+    birthday = person.get('BIRTH', {}).get('DATE', '')
+    death_date = person.get('DEATH', {}).get('DATE', '')
+    age = calculate_age(birthday, death_date)
     
-#     # Find the family tag they belong to (as husband or wife)
-#     spouse_tag = 'N/A'
-#     parent_tag = 'N/A'
+    # Find the family tag they belong to (as husband or wife)
+    spouse_tag = 'N/A'
+    parent_tag = 'N/A'
 
-#     if 'FAMC' in person:
-#         family_id = person['FAMC']
-#         parents = find_parents(family_id)
-#         parent_names = [parent.get('NAME', '') for parent in parents]
-#         parent_tag = family_id
+    if 'FAMC' in person:
+        family_id = person['FAMC']
+        parents = find_parents(family_id)
+        parent_names = [parent.get('NAME', '') for parent in parents]
+        parent_tag = family_id
     
-#     for family in families:
-#         fam_id = family.get('FAM', '')
+    for family in families:
+        fam_id = family.get('FAM', '')
 
-#         husband_id = family.get('HUSB', '')
-#         wife_id = family.get('WIFE', '')
-#         if indi_id == husband_id or indi_id == wife_id:
-#             spouse_tag = family.get('FAM', '')
-#             break
+        husband_id = family.get('HUSB', '')
+        wife_id = family.get('WIFE', '')
+        if indi_id == husband_id or indi_id == wife_id:
+            spouse_tag = family.get('FAM', '')
+            break
 
-#     print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10} {:<20}".format(indi_id, name, sex, birthday, age, spouse_tag, parent_tag))
+    print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10} {:<20}".format(indi_id, name, sex, birthday, age, spouse_tag, parent_tag))
 
 print("\nFamilies:")
 print("{:<10} {:<15} {:<15} {:<20} {:<20} {:<15} {:<35} {:<40}".format(
@@ -172,35 +172,35 @@ for family in families:
     
     print("{:<10} {:<15} {:<15} {:<20} {:<20} {:<15} {:<35} {:<40}".format(
         fam_id, marriage_date, divorced_date, husband_id, husband_name, wife_id, wife_name, children_names))
+    
+print()
+print()
 
-def check_marriage_before_death(people, families):
-    print("{:<15} {:<15} {:<20} {:<20}".format("Husband Death", "Wife Death", "Marriage Date", "Result"))
+# SPRINT 1 - SD - Birth before Marriage
+def check_birth_before_marriage(people, families):
     for family in families:
         husband_id = family.get('HUSB', '')
         wife_id = family.get('WIFE', '')
         marriage_date = family.get('MARR', {}).get('DATE', '')
 
-        if not husband_id or not wife_id:
+        if not husband_id or not wife_id or not marriage_date:
             continue
-        
-        husband_birth = "N/A"
-        wife_birth = "N/A"
-        result = "Pass"
 
-        if husband_id:
-            hus_death = next((person.get('DEATH', {}).get('DATE', '') for person in people if person.get('INDI', '') == husband_id), '')
-            if hus_death:
-                husband_birth = datetime.strptime(hus_death, "%d %b %Y").strftime("%d %b %Y")
+        husband_birth_date = next((person.get('BIRTH', {}).get('BDATE', '') for person in people if person.get('INDI', '') == husband_id), '')
+        wife_birth_date = next((person.get('BIRTH', {}).get('BDATE', '') for person in people if person.get('INDI', '') == wife_id), '')
 
-        if wife_id:
-            wife_death = next((person.get('DEATH', {}).get('DATE', '') for person in people if person.get('INDI', '') == wife_id), '')
-            if wife_death:
-                wife_birth = datetime.strptime(wife_death, "%d %b %Y").strftime("%d %b %Y")
+        husband_birth_date_format = datetime.strptime(husband_birth_date, "%d %b %Y")
+        wife_birth_date_format = datetime.strptime(wife_birth_date, "%d %b %Y")
 
-        if marriage_date and hus_death and wife_death:
-            if datetime.strptime(hus_death, "%d %b %Y") < datetime.strptime(marriage_date, "%d %b %Y") or datetime.strptime(wife_death, "%d %b %Y") > datetime.strptime(marriage_date, "%d %b %Y"):
-                result = "Fail"
+        if husband_birth_date and wife_birth_date and marriage_date:
+            if husband_birth_date_format > datetime.strptime(marriage_date, "%d %b %Y"):
+                error_message = f"ERROR: FAMILY: US02: {family.get('FAM', '')}: Husband's birthday of {husband_birth_date_format} is after marriage."
+                print(error_message)
+                return False
+            elif wife_birth_date_format > datetime.strptime(marriage_date, "%d %b %Y"):
+                error_message = f"ERROR: FAMILY: US02: {family.get('FAM', '')}: Wife's birthday of {wife_birth_date_format} is after marriage"
+                print(error_message)
+                return False
+    return True
 
-        print("{:<15} {:<15} {:<20} {:<20}".format(husband_birth, wife_birth, marriage_date, result))
-
-check_marriage_before_death(people, families)
+check_birth_before_marriage(people, families)
