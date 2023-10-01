@@ -188,19 +188,61 @@ def check_birth_before_marriage(people, families):
 
         husband_birth_date = next((person.get('BIRTH', {}).get('BDATE', '') for person in people if person.get('INDI', '') == husband_id), '')
         wife_birth_date = next((person.get('BIRTH', {}).get('BDATE', '') for person in people if person.get('INDI', '') == wife_id), '')
-
+        
+        marriage_date_format = datetime.strptime(marriage_date, "%d %b %Y")
         husband_birth_date_format = datetime.strptime(husband_birth_date, "%d %b %Y")
         wife_birth_date_format = datetime.strptime(wife_birth_date, "%d %b %Y")
 
         if husband_birth_date and wife_birth_date and marriage_date:
             if husband_birth_date_format > datetime.strptime(marriage_date, "%d %b %Y"):
-                error_message = f"ERROR: FAMILY: US02: {family.get('FAM', '')}: Husband's birthday of {husband_birth_date_format} is after marriage."
+                error_message = f"ERROR: FAMILY: US02: {family.get('FAM', '')}: Husband's birthday of {husband_birth_date_format} is after marriage date of {marriage_date_format}."
                 print(error_message)
                 return False
             elif wife_birth_date_format > datetime.strptime(marriage_date, "%d %b %Y"):
-                error_message = f"ERROR: FAMILY: US02: {family.get('FAM', '')}: Wife's birthday of {wife_birth_date_format} is after marriage"
+                error_message = f"ERROR: FAMILY: US02: {family.get('FAM', '')}: Wife's birthday of {wife_birth_date_format} is after marriage date of {marriage_date_format}."
                 print(error_message)
                 return False
     return True
 
 check_birth_before_marriage(people, families)
+
+# SPRINT 1 - SD - Marriage before Death
+
+def check_marriage_before_death(people, families):
+    for family in families:
+        husband_id = family.get('HUSB', '')
+        wife_id = family.get('WIFE', '')
+        marriage_date = family.get('MARR', {}).get('DATE', '')
+
+        if not husband_id or not wife_id or not marriage_date:
+            continue
+
+        husband_death_date = next((person.get('DEATH', {}).get('DATE', '') for person in people if person.get('INDI', '') == husband_id), '')
+        wife_death_date = next((person.get('DEATH', {}).get('DATE', '') for person in people if person.get('INDI', '') == wife_id), '')
+
+        marriage_date_format = datetime.strptime(marriage_date, "%d %b %Y")
+
+        if husband_death_date:
+            husband_death_date_format = datetime.strptime(husband_death_date, "%d %b %Y")
+        else:
+            husband_death_date_format = None
+        
+        if wife_death_date:
+            wife_death_date_format = datetime.strptime(wife_death_date, "%d %b %Y")
+        else:
+            wife_death_date_format = None
+
+        if husband_death_date_format is not None and marriage_date:
+            if husband_death_date_format < datetime.strptime(marriage_date, "%d %b %Y"):
+                error_message = f"ERROR: FAMILY: US05: {family.get('FAM', '')}: Husband's death of {husband_death_date_format} is before marriage date of {marriage_date_format}"
+                print(error_message)
+                return False
+
+        if wife_death_date_format is not None and marriage_date:  
+            if wife_death_date_format < datetime.strptime(marriage_date, "%d %b %Y"):
+                error_message = f"ERROR: FAMILY: US05: {family.get('FAM', '')}: Wife's death of {wife_death_date_format} is before marriage date of {marriage_date_format}"
+                print(error_message)
+                return False
+    return True
+
+check_marriage_before_death(people, families)

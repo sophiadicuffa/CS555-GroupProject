@@ -110,14 +110,35 @@ def check_marriage_before_death(people, families):
         if not husband_id or not wife_id or not marriage_date:
             continue
 
-        husband_birth_date = next((person.get('DEATH', {}).get('DATE', '') for person in people if person.get('INDI', '') == husband_id), '')
-        wife_birth_date = next((person.get('DEATH', {}).get('DATE', '') for person in people if person.get('INDI', '') == wife_id), '')
+        husband_death_date = next((person.get('DEATH', {}).get('DATE', '') for person in people if person.get('INDI', '') == husband_id), '')
+        wife_death_date = next((person.get('DEATH', {}).get('DATE', '') for person in people if person.get('INDI', '') == wife_id), '')
 
-        if husband_birth_date and wife_birth_date and marriage_date:
-            if datetime.strptime(husband_birth_date, "%d %b %Y") < datetime.strptime(marriage_date, "%d %b %Y") or datetime.strptime(wife_birth_date, "%d %b %Y") > datetime.strptime(marriage_date, "%d %b %Y"):
-                print("here")
+        marriage_date_format = datetime.strptime(marriage_date, "%d %b %Y")
+
+
+        if husband_death_date:
+            husband_death_date_format = datetime.strptime(husband_death_date, "%d %b %Y")
+        else:
+            husband_death_date_format = None
+        
+        if wife_death_date:
+            wife_death_date_format = datetime.strptime(wife_death_date, "%d %b %Y")
+            print(wife_death_date_format)
+        else:
+            wife_death_date_format = None
+
+        if husband_death_date_format is not None and marriage_date:
+            if husband_death_date_format < datetime.strptime(marriage_date, "%d %b %Y"):
+                error_message = f"ERROR: FAMILY: US05: {family.get('FAM', '')}: Husband's death of {husband_death_date_format} is before marriage date of {marriage_date_format}"
+                print(error_message)
+                return False
+
+        if wife_death_date_format is not None and marriage_date:  
+            if wife_death_date_format < datetime.strptime(marriage_date, "%d %b %Y"):
+                error_message = f"ERROR: FAMILY: US05: {family.get('FAM', '')}: Wife's death of {wife_death_date_format} is before marriage date of {marriage_date_format}"
+                print(error_message)
                 return False
     return True
-pass
 
 check_marriage_before_death(people, families)
+
