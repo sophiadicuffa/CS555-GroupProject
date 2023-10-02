@@ -122,7 +122,7 @@ for person in people:
     indi_id = person.get('INDI', '')
     name = person.get('NAME', '')
     sex = person.get('SEX', '')
-    birthday = person.get('BIRTH', {}).get('DATE', '')
+    birthday = person.get('BIRTH', {}).get('BDATE', '')
     death_date = person.get('DEATH', {}).get('DATE', '')
     age = calculate_age(birthday, death_date)
     
