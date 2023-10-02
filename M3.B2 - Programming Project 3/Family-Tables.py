@@ -120,7 +120,7 @@ for person in people:
     name = person.get('NAME', '')
     sex = person.get('SEX', '')
     birthday = person.get('BIRTH', {}).get('BDATE', '')
-    death_date = person.get('DEATH', {}).get('DATE', 'N/A')
+    death_date = person.get('DEATH', {}).get('DATE', '')
     age = calculate_age(birthday, death_date)
     
     # Find the family tag they belong to (as husband or wife)
@@ -142,7 +142,7 @@ for person in people:
             spouse_tag = family.get('FAM', '')
             break
 
-    print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10} {:<20} {:<15}".format(indi_id, name, sex, birthday, age, spouse_tag, parent_tag, death_date))
+    print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10} {:<20}".format(indi_id, name, sex, birthday, age, spouse_tag, parent_tag))
 
 print("\nFamilies:")
 print("{:<10} {:<15} {:<15} {:<20} {:<20} {:<15} {:<35} {:<40}".format(
