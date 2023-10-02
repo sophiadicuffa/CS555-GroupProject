@@ -112,7 +112,7 @@ def find_children(family_id):
 def find_parents(family_id):
     return [person for person in people if family_id in person.get('FAMS', [])]
 
-print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10} {:<20} {:<15}".format("ID", "Name", "Sex", "Birthday", "Age", "Spouse", "Parent", "Death Date"))
+print("{:<10} {:<30} {:<10} {:<15} {:<20} {:<10} {:<20}".format("ID", "Name", "Sex", "Birthday", "Age", "Spouse", "Parent"))
 
 # Iterate through the individuals
 for person in people:
