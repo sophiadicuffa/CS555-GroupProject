@@ -264,3 +264,5 @@ def is_birth_before_death(individual):
     
     return False
 
+is_birth_before_death(person)
+
