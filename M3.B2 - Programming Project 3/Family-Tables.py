@@ -1,7 +1,7 @@
 # Sophia DiCuffa, Nadeya De Diago, Amanda Vu
 # CS555 M3.B2
 
-from datetime import datetime
+from datetime import datetime, date
 
 people = []
 families = []
@@ -9,30 +9,28 @@ current_person = {}
 current_family = {}
 
 def calculate_age(birthdate, deathdate):
-
     if not birthdate:
-
         return "N/A"
-        
-    birthdate = datetime.strptime(birthdate, "%d %b %Y")
+    
+    try:
+        birthdate = datetime.strptime(birthdate, "%d %b %Y")
+    except ValueError:
+        return "N/A"  # Invalid date format
 
-    today = datetime.today()
+    today = date.today()
 
     age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
 
-
     if deathdate:
-
-        deathdate = datetime.strptime(deathdate, "%d %b %Y")
+        try:
+            deathdate = datetime.strptime(deathdate, "%d %b %Y")
+        except ValueError:
+            return f"{age} (Died: Invalid date format)"
 
         age_at_death = deathdate.year - birthdate.year - ((deathdate.month, deathdate.day) < (birthdate.month, birthdate.day))
-
         return f"{age} (Died at {age_at_death})"
-
     
-
     return age
-
 
 
 def process_line(line):
@@ -247,44 +245,87 @@ def check_marriage_before_death(people, families):
 
 check_marriage_before_death(people, families)
 
+# Create a set to keep track of individuals for whom we've already checked the birth before death condition
+checked_birth_before_death = set()
+
 def is_birth_before_death(individual):
-    birth_date = individual.get("birth_date")
-    death_date = individual.get("death_date")
-    
-    if birth_date and death_date:
-        birth_date = datetime.strptime(birth_date, "%Y-%m-%d")
-        death_date = datetime.strptime(death_date, "%Y-%m-%d")
-        
-        if birth_date <= death_date:
-            return True
-        else:
-            error_message = f"ERROR: INDIVIDUAL: US03: {individual.get('INDI', '')}: Died {death_date} before born {birth_date}"
-            print(error_message)
-            return False
-    
-    return False
-
-is_birth_before_death(person)
-
-def is_divorce_before_death(individual):
-    death_date = individual.get("death_date")
-    divorce_date = individual.get("divorce_date")
     indi_id = individual.get("INDI", "")
 
-    if death_date and divorce_date:
-        death_date = datetime.strptime(death_date, "%Y-%m-%d")
-        divorce_date = datetime.strptime(divorce_date, "%Y-%m-%d")
+    # Check if we have already checked this individual
+    if indi_id in checked_birth_before_death:
+        return True
 
-        if divorce_date < death_date:
-            return True
-        else:
-            error_message = f"ERROR: INDIVIDUAL: US06: {indi_id}: Divorced {divorce_date} after death on {death_date}"
+    birth_date = individual.get("BIRTH", {}).get("BDATE", "")
+    death_date = individual.get("DEATH", {}).get("DATE", "")
+
+    if birth_date and death_date:
+        birth_date_format = datetime.strptime(birth_date, "%d %b %Y")
+        death_date_format = datetime.strptime(death_date, "%d %b %Y")
+
+        if birth_date_format > death_date_format:
+            error_message = f"ERROR: INDIVIDUAL: US03: {indi_id}: Died {death_date_format.strftime('%d %b %Y')} before born {birth_date_format.strftime('%d %b %Y')}"
             print(error_message)
-            return False
+            checked_birth_before_death.add(indi_id)
 
-    return True  # If no divorce date or no death date, consider it valid
+    return True  # If no birth date or no death date, consider it valid
 
-is_divorce_before_death(person)
+for person in people:
+    is_birth_before_death(person)
+
+# Also, check the birth before death for spouses in families
+for family in families:
+    husband_id = family.get('HUSB', '')
+    wife_id = family.get('WIFE', '')
+
+    # Check husband's birth date
+    if husband_id:
+        husband = next((person for person in people if person.get('INDI', '') == husband_id), None)
+        if husband:
+            is_birth_before_death(husband)
+
+    # Check wife's birth date
+    if wife_id:
+        wife = next((person for person in people if person.get('INDI', '') == wife_id), None)
+        if wife:
+            is_birth_before_death(wife)
+
+def is_divorce_before_death(individuals, families):
+    for family in families:
+        husband_id = family.get('HUSB', '')
+        wife_id = family.get('WIFE', '')
+        divorce_date = family.get('DIV', {}).get('DATE', '')
+
+        if husband_id:
+            husband = next((person for person in individuals if person.get('INDI', '') == husband_id), None)
+            if husband:
+                death_date = husband.get("DEATH", {}).get("DATE", "")
+                if death_date and divorce_date:
+                    death_date_format = datetime.strptime(death_date, "%d %b %Y")
+                    divorce_date_format = datetime.strptime(divorce_date, "%d %b %Y")
+
+                    if divorce_date_format > death_date_format:
+                        error_message = f"ERROR: FAMILY: US06: {family.get('FAM', '')}: Divorced {divorce_date_format.strftime('%Y-%m-%d')} after husband's death on {death_date_format.strftime('%Y-%m-%d')}"
+                        print(error_message)
+                        return False
+
+        if wife_id:
+            wife = next((person for person in individuals if person.get('INDI', '') == wife_id), None)
+            if wife:
+                death_date = wife.get("DEATH", {}).get("DATE", "")
+                if death_date and divorce_date:
+                    death_date_format = datetime.strptime(death_date, "%d %b %Y")
+                    divorce_date_format = datetime.strptime(divorce_date, "%d %b %Y")
+
+                    if divorce_date_format > death_date_format:
+                        error_message = f"ERROR: FAMILY: US06: {family.get('FAM', '')}: Divorced {divorce_date_format.strftime('%Y-%m-%d')} after wife's death on {death_date_format.strftime('%Y-%m-%d')}"
+                        print(error_message)
+                        return False
+
+    return True
+
+# Call the function with both individuals and families
+is_divorce_before_death(people, families)
+
 
 def MarriageBeforeDivorce(marriage_date, divorce_date, family_id):
     try:
@@ -313,4 +354,5 @@ def Date_Before_Current_Date(dateString):
         return f"ERROR: INDIVIDUAL: US01: 7: bi00: Birthday {dateString} occurs in the future"
 
     return "Valid"  
+
 
