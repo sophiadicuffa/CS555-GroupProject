@@ -342,19 +342,43 @@ def MarriageBeforeDivorce(families):
 
 MarriageBeforeDivorce(families)
 
-def Date_Before_Current_Date(dateString):
-    if dateString == 'NA':
-        return "Valid"  # Return a message indicating a valid date
+def Date_Before_Current_Date(individuals, families):
+    for individual in individuals:
+        indi_id = individual.get('INDI', '')
+        name = individual.get('NAME', '')
+        
+        birth_date = individual.get('BIRTH', {}).get('BDATE', '')
+        death_date = individual.get('DEATH', {}).get('DATE', '')
 
-    try:
-        compareDate = datetime.strptime(dateString, '%d %b %Y').date()
-    except ValueError:
-        return "ERROR: Invalid date format"  # Handle invalid date formats
+        # For birth date
+        if birth_date:
+            birth_date_format = datetime.strptime(birth_date, "%d %b %Y").date()
+            if birth_date_format > date.today():
+                print(f"ERROR: INDIVIDUAL: US01: {indi_id}: {name}: Birthday {birth_date_format.strftime('%Y-%m-%d')} occurs in the future")
+        
+        # For death date
+        if death_date:
+            death_date_format = datetime.strptime(death_date, "%d %b %Y").date()
+            if death_date_format > date.today():
+                print(f"ERROR: INDIVIDUAL: US01: {indi_id}: {name}: Death {death_date_format.strftime('%Y-%m-%d')} occurs in the future")
 
-    today = date.today()
-    if compareDate > today:
-        return f"ERROR: INDIVIDUAL: US01: 7: bi00: Birthday {dateString} occurs in the future"
+    for family in families:
+        fam_id = family.get('FAM', '')
+        marriage_date = family.get('MARR', {}).get('DATE', '')
+        divorce_date = family.get('DIV', {}).get('DATE', '')
 
-    return "Valid"  
+        # For marriage date
+        if marriage_date:
+            marriage_date_format = datetime.strptime(marriage_date, "%d %b %Y").date()
+            if marriage_date_format > date.today():
+                print(f"ERROR: FAMILY: US01: {fam_id}: Marriage date {marriage_date_format.strftime('%Y-%m-%d')} occurs in the future")
+
+        # For divorce date
+        if divorce_date:
+            divorce_date_format = datetime.strptime(divorce_date, "%d %b %Y").date()
+            if divorce_date_format > date.today():
+                print(f"ERROR: FAMILY: US01: {fam_id}: Divorce date {divorce_date_format.strftime('%Y-%m-%d')} occurs in the future")
+
+Date_Before_Current_Date(people, families)
 
 
