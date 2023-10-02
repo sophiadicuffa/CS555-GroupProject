@@ -300,3 +300,20 @@ def MarriageBeforeDivorce(marriage_date, divorce_date, family_id):
 
 MarriageBeforeDivorce(marriage_date, divorce_date, family_id)
 
+def Date_Before_Current_Date(dateString):
+    if dateString == 'NA':
+        return "Valid"  # Return a message indicating a valid date
+
+    try:
+        compareDate = datetime.strptime(dateString, '%d %b %Y').date()
+    except ValueError:
+        return "ERROR: Invalid date format"  # Handle invalid date formats
+
+    today = date.today()
+    if compareDate > today:
+        return f"ERROR: INDIVIDUAL: US01: 7: bi00: Birthday {dateString} occurs in the future"
+
+    return "Valid"  
+
+Date_Before_Current_Date(dateString)
+
