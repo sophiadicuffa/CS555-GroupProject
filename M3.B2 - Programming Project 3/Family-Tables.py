@@ -84,12 +84,11 @@ def process_line(line):
                 current_person['DEATH']['DATE'] = ' '.join(parts[2:])
         elif 'BIRTH' in current_person:
             if tag == 'DATE':
-                current_person['BIRTH']['BDATE'] = ' '.join(parts[2:])
-        if 'MARR' in current_family and tag == 'DATE':
-            current_family['MARR']['DATE'] = ' '.join(parts[2:])
-            
+                current_person['BIRTH']['BDATE'] = ' '.join(parts[2:])      
         if 'DIV' in current_family and tag == 'DATE':
             current_family['DIV']['DATE'] = ' '.join(parts[2:])
+        elif 'MARR' in current_family and tag == 'DATE':
+            current_family['MARR']['DATE'] = ' '.join(parts[2:])  
             
 
 
@@ -336,8 +335,9 @@ def MarriageBeforeDivorce(families):
         if marriage_date and divorce_date:  # Checking only when both marriage and divorce dates are available
             marriage_date_format = datetime.strptime(marriage_date, "%d %b %Y")
             divorce_date_format = datetime.strptime(divorce_date, "%d %b %Y")
+            print(divorce_date_format)
 
-            if divorce_date_format < marriage_date_format:
+            if divorce_date_format > marriage_date_format:
                 print(f"ERROR: FAMILY: US04: {family_id}: bf02: Divorced {divorce_date_format.strftime('%Y-%m-%d')} before married {marriage_date_format.strftime('%Y-%m-%d')}")
 
 MarriageBeforeDivorce(families)
