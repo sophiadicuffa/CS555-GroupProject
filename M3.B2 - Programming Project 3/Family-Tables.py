@@ -298,7 +298,6 @@ def MarriageBeforeDivorce(marriage_date, divorce_date, family_id):
     except ValueError:
         raise ValueError(f"ERROR: FAMILY: US04: {family_id}: Invalid date format for marriage or divorce date")
 
-MarriageBeforeDivorce(marriage_date, divorce_date, family_id)
 
 def Date_Before_Current_Date(dateString):
     if dateString == 'NA':
@@ -314,6 +313,4 @@ def Date_Before_Current_Date(dateString):
         return f"ERROR: INDIVIDUAL: US01: 7: bi00: Birthday {dateString} occurs in the future"
 
     return "Valid"  
-
-Date_Before_Current_Date(dateString)
 
