@@ -286,3 +286,17 @@ def is_divorce_before_death(individual):
 
 is_divorce_before_death(person)
 
+def MarriageBeforeDivorce(marriage_date, divorce_date, family_id):
+    try:
+        marriage_date = datetime.strptime(marriage_date, '%Y-%m-%d')
+        divorce_date = datetime.strptime(divorce_date, '%Y-%m-%d')
+        
+        if marriage_date < divorce_date:
+            return True
+        else:
+            raise ValueError(f"ERROR: FAMILY: US04: {family_id}: Divorced {divorce_date.strftime('%Y-%m-%d')} before married {marriage_date.strftime('%Y-%m-%d')}")
+    except ValueError:
+        raise ValueError(f"ERROR: FAMILY: US04: {family_id}: Invalid date format for marriage or divorce date")
+
+MarriageBeforeDivorce(marriage_date, divorce_date, family_id)
+
