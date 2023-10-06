@@ -165,7 +165,6 @@ for family in families:
         continue
 
     children_names = ', '.join([child.get('INDI', '') for child in children])
-    status = "Married" if not divorced_date or divorced_date == 'N/A' else "Divorced"
     
     print("{:<10} {:<15} {:<15} {:<20} {:<20} {:<15} {:<35} {:<40}".format(
         fam_id, marriage_date, divorced_date, husband_id, husband_name, wife_id, wife_name, children_names))
@@ -335,9 +334,8 @@ def MarriageBeforeDivorce(families):
         if marriage_date and divorce_date:  # Checking only when both marriage and divorce dates are available
             marriage_date_format = datetime.strptime(marriage_date, "%d %b %Y")
             divorce_date_format = datetime.strptime(divorce_date, "%d %b %Y")
-            print(divorce_date_format)
 
-            if divorce_date_format > marriage_date_format:
+            if divorce_date_format < marriage_date_format:
                 print(f"ERROR: FAMILY: US04: {family_id}: bf02: Divorced {divorce_date_format.strftime('%Y-%m-%d')} before married {marriage_date_format.strftime('%Y-%m-%d')}")
 
 MarriageBeforeDivorce(families)
@@ -380,5 +378,29 @@ def Date_Before_Current_Date(individuals, families):
                 print(f"ERROR: FAMILY: US01: {fam_id}: Divorce date {divorce_date_format.strftime('%Y-%m-%d')} occurs in the future")
 
 Date_Before_Current_Date(people, families)
+
+# PAIR PROGRAMMING - SD - Fewer than 15 siblings
+
+def check_fewer_than_15_siblings(people, families):
+    for family in families:
+        children_ids = family.get('CHIL', [])
+        
+        if len(children_ids) >= 15:
+            family_id = family.get('FAM', '')
+            error_message = f"ERROR: FAMILY: US15: {family_id}: More than 15 siblings in the family."
+            print(error_message)
+
+# Create a fake family with more than 15 siblings to test 
+fake_family = {
+    'FAM': 'F01 (FAKE FAMILY)',
+    'HUSB': 'I01',
+    'WIFE': 'I02',
+    'CHIL': ['I03', 'I04', 'I05', 'I06', 'I07', 'I08', 'I09', 'I10', 'I11', 'I12', 'I13', 'I14', 'I15', 'I16', 'I17', 'I18', 'I19', 'I20']
+}
+families.append(fake_family)
+
+check_fewer_than_15_siblings(people, families)
+
+
 
 
