@@ -1,0 +1,23 @@
+def check_birth_before_parents_marriage(people, families):
+    for family in families:
+        fam_id = family.get('FAM', '')
+        children = find_children(fam_id)
+        marriage_date = family.get('MARR', {}).get('DATE', '')
+
+        if not marriage_date:
+            continue
+
+        marriage_date_format = datetime.strptime(marriage_date, "%d %b %Y").date()
+
+        for child in children:
+            child_birth_date = child.get("BIRTH", {}).get("BDATE", "")
+            if child_birth_date:
+                child_birth_date = child_birth_date.strip()
+                if child_birth_date:
+                    child_birth_date_format = datetime.strptime(child_birth_date, "%d %b %Y").date()
+                    if child_birth_date_format < marriage_date_format:
+                        error_message = f"ERROR: INDIVIDUAL: US08: {child.get('INDI', '')}: Born {child_birth_date_format.strftime('%Y-%m-%d')} before parents' marriage on {marriage_date_format.strftime('%Y-%m-%d')}"
+                        print(error_message)
+
+# Call the function with individuals and families
+check_birth_before_parents_marriage(people, families)
