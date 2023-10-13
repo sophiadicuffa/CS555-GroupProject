@@ -1,0 +1,48 @@
+import unittest
+from datetime import datetime
+from FamilyTables import check_birth_before_marriage, check_marriage_before_death, process_line
+
+class TestDateChecks(unittest.TestCase):
+    def setUp(self):
+        # Sample individuals and families data for testing
+        self.people = [
+            {
+                "INDI": "I1",
+                "BIRTH": {"BDATE": "01 JAN 1980"},
+                "DEATH": {"DATE": "15 FEB 2005"}
+            },
+            {
+                "INDI": "I2",
+                "BIRTH": {"BDATE": "12 APR 1975"},
+                "DEATH": {"DATE": "20 DEC 2003"}
+            },
+       
+        ]
+
+        self.families = [
+            {
+                "FAM": "F1",
+                "HUSB": "I1",
+                "WIFE": "I2",
+                "MARR": {"DATE": "05 JUN 2000"}
+            },
+        
+        ]
+
+    def test_birth_before_marriage(self):
+        # Test case for check_birth_before_marriage function
+        result = check_birth_before_marriage(self.people, self.families)
+        self.assertTrue(result, "Birth before marriage check failed.")
+
+    def test_marriage_before_death(self):
+        # Test case for check_marriage_before_death function
+        result = check_marriage_before_death(self.people, self.families)
+        self.assertTrue(result, "Marriage before death check failed.")
+
+# Bad Smell 2: Long Method
+
+# The process_line function is quite long and handles multiple responsibilities. 
+# I cannot use unittest on process_line, but you can manually test it by calling the function and inspecting the output.
+
+if __name__ == "__main__":
+    unittest.main()
