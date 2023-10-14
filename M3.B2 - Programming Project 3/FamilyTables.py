@@ -422,17 +422,18 @@ def check_fewer_than_15_siblings(people, families):
             family_id = family.get('FAM', '')
             error_message = f"ERROR: FAMILY: US15: {family_id}: More than 15 siblings in the family."
             errors.append(error_message)
+            print(error_message)
     return errors
 
 
 # Create a fake family with more than 15 siblings to test
-# fake_family = {
-#     'FAM': 'F01 (FAKE FAMILY)',
-#     'HUSB': 'I01',
-#     'WIFE': 'I02',
-#     'CHIL': ['I03', 'I04', 'I05', 'I06', 'I07', 'I08', 'I09', 'I10', 'I11', 'I12', 'I13', 'I14', 'I15', 'I16', 'I17', 'I18', 'I19', 'I20']
-# }
-# families.append(fake_family)
+fake_family = {
+    'FAM': 'F01 (FAKE FAMILY)',
+    'HUSB': 'I01',
+    'WIFE': 'I02',
+    'CHIL': ['I03', 'I04', 'I05', 'I06', 'I07', 'I08', 'I09', 'I10', 'I11', 'I12', 'I13', 'I14', 'I15', 'I16', 'I17', 'I18', 'I19', 'I20']
+}
+families.append(fake_family)
 
 check_fewer_than_15_siblings(people, families)
 
@@ -463,6 +464,4 @@ def check_birth_before_parents_marriage(people, families):
                         
     return "ERROR"
 
-
-# Call the function with individuals and families
 check_birth_before_parents_marriage(people, families)
