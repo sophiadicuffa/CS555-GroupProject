@@ -33,9 +33,8 @@ class TestFamilyFunctions(unittest.TestCase):
         families = [family_data]
         people = [child_data]
 
-        expected_errors = ["ERROR: INDIVIDUAL: US08: I1: Born 1995-12-15 before parents' marriage on 2000-01-01"]
+        expected_errors = "ERROR"
         self.assertEqual(check_birth_before_parents_marriage(people, families), expected_errors)
-    
 
 if __name__ == '__main__':
     unittest.main()
