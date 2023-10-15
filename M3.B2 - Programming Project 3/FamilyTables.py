@@ -465,3 +465,73 @@ def check_birth_before_parents_marriage(people, families):
     return "ERROR"
 
 check_birth_before_parents_marriage(people, families)
+
+def check_birth_before_death_of_parents(people, families):
+    for family in families:
+        children = family.get("CHIL", [])
+        husband_id = family.get("HUSB", "")
+        wife_id = family.get("WIFE", "")
+        
+        for child_id in children:
+            child = next((person for person in people if person.get('INDI', '') == child_id), None)
+            mother = next((person for person in people if person.get('INDI', '') == wife_id), None)
+            father = next((person for person in people if person.get('INDI', '') == husband_id), None)
+
+            if child and mother and father:
+                child_birth_date = child.get("BIRT", {}).get("DATE", "")
+                mother_death_date = mother.get("DEAT", {}).get("DATE", "")
+                father_death_date = father.get("DEAT", {}).get("DATE", "")
+
+                if child_birth_date and mother_death_date:
+                    child_birth_date_format = datetime.strptime(child_birth_date, "%d %b %Y")
+                    mother_death_date_format = datetime.strptime(mother_death_date, "%d %b %Y")
+
+                    if child_birth_date_format > mother_death_date_format:
+                        error_message = f"ERROR: INDIVIDUAL: US09: {child_id}: Child born {child_birth_date_format.strftime('%d %b %Y')} after mother's death {mother_death_date_format.strftime('%d %b %Y')}"
+                        print(error_message)
+
+                if child_birth_date and father_death_date:
+                    child_birth_date_format = datetime.strptime(child_birth_date, "%d %b %Y")
+                    father_death_date_format = datetime.strptime(father_death_date, "%d %b %Y")
+
+                    if child_birth_date_format > father_death_date_format:
+                        error_message = f"ERROR: INDIVIDUAL: US09: {child_id}: Child born {child_birth_date_format.strftime('%d %b %Y')} after father's death {father_death_date_format.strftime('%d %b %Y')}"
+                        print(error_message)
+
+check_birth_before_death_of_parents(people, families)
+
+def check_male_last_names(people, families):
+    for family in families:
+        husband_id = family.get('HUSB', '')
+        children = find_children(family.get('FAM', ''))
+
+        # Skip processing if husband or children are not present
+        if not husband_id or not children:
+            continue
+
+        # Get the last name of the husband
+        husband_last_name = next(
+            (person.get('NAME', '').split('/')[1] for person in people if person.get('INDI', '') == husband_id), '')
+
+        if not husband_last_name:
+            continue
+
+        # Check the last names of male children in the family
+        for child in children:
+            child_id = child.get('INDI', '')
+            sex = child.get('SEX', '')
+
+            if sex == 'M':
+                child_last_name = next(
+                    (person.get('NAME', '').split('/')[1] for person in people if person.get('INDI', '') == child_id), '')
+
+                if child_last_name != husband_last_name:
+                    error_message = f"ERROR: FAMILY: US16: {family.get('FAM', '')}: Male child ({child_id}) has a different last name ({child_last_name}) than the husband ({husband_id}) ({husband_last_name})."
+                    print(error_message)
+                    return False
+
+    return True
+
+# Call the function with both individuals and families
+check_male_last_names(people, families)
+
