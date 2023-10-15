@@ -9,10 +9,8 @@ def Date_Before_Current_Date(dateString):
         return True
     
     try:
-        # Assuming the input date string is in 'YYYY-MM-DD' format
         compareDate = datetime.strptime(dateString, '%d %b %Y').date()
     except ValueError:
-        # Handle invalid date formats here
         return False
 
     today = date.today()
