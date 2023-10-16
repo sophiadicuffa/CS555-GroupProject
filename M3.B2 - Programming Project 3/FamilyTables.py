@@ -553,4 +553,27 @@ def less_than_150(people):
 # Call the less_than_150 function
 less_than_150(people)
 
+def check_marriage_validity(people, families):
+    for family in families:
+        husband_id = family.get('HUSB', '')
+        wife_id = family.get('WIFE', '')
+        marriage_date_str = family.get('MARR', {}).get('DATE', '')
+        
+        if not husband_id or not wife_id or not marriage_date_str:
+            continue
 
+        husband_birth_date = get_birth_date(husband_id, people)
+        wife_birth_date = get_birth_date(wife_id, people)
+        marriage_date = parse_date(marriage_date_str)
+
+        if husband_birth_date and marriage_date and husband_birth_date > marriage_date:
+            error_message = f"ERROR: INDIVIDUAL: US10: {husband_id}: Birthday {husband_birth_date.strftime('%d %b %Y')} should be at least 14 years before marriage in family {family.get('FAM', '')}."
+            print(error_message)
+
+        if wife_birth_date and marriage_date and wife_birth_date > marriage_date:
+            error_message = f"ERROR: INDIVIDUAL: US10: {wife_id}: Birthday {wife_birth_date.strftime('%d %b %Y')} should be at least 14 years before marriage in family {family.get('FAM', '')}."
+            print(error_message)
+
+    # Call the function check_marriage_validity
+    check_marriage_validity(people, families)
+    
