@@ -1,7 +1,7 @@
 # Sophia DiCuffa, Nadeya De Diago, Amanda Vu
 # CS555 M3.B2
 
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 people = []
 families = []
@@ -462,6 +462,44 @@ def check_birth_before_parents_marriage(people, families):
     return "ERROR"
 
 check_birth_before_parents_marriage(people, families)
+
+def birth_before_death_of_parents(people, families):
+    for family in families:
+        husband_id = family.get('HUSB', '')
+        wife_id = family.get('WIFE', '')
+        children = find_children(family.get('FAM', ''))
+
+        # Check if husband and wife are present
+        if not husband_id or not wife_id:
+            continue
+
+        # Get the death dates of husband and wife
+        husband_death_date = get_death_date(husband_id, people)
+        wife_death_date = get_death_date(wife_id, people)
+
+        for child in children:
+            child_id = child.get('INDI', '')
+            child_birth_date = child.get('BIRTH', {}).get('BDATE', '')
+
+            if child_birth_date:
+                child_birth_date_format = datetime.strptime(
+                    child_birth_date, "%d %b %Y").date()
+
+                if wife_death_date:
+                    wife_death_date_format = wife_death_date.date()
+                    if child_birth_date_format > wife_death_date_format:
+                        error_message = f"ERROR: INDIVIDUAL: US09: {child_id}: Child born {child_birth_date_format.strftime('%d %b %Y')} after mother's death {wife_death_date.strftime('%d %b %Y')}"
+                        print(error_message)
+
+                if husband_death_date:
+                    # Calculate the date nine months after the death of the father
+                    nine_months_after_death = husband_death_date + timedelta(days=270)
+                    nine_months_after_death_date = nine_months_after_death.date()
+                    if child_birth_date_format > nine_months_after_death_date:
+                        error_message = f"ERROR: INDIVIDUAL: US09: {child_id}: Child born {child_birth_date_format.strftime('%d %b %Y')} after nine months of father's death {husband_death_date.strftime('%d %b %Y')}"
+                        print(error_message)
+
+birth_before_death_of_parents(people, families)
 
 def check_male_last_names(people, families):
     for family in families:
