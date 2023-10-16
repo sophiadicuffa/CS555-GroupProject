@@ -535,3 +535,21 @@ def check_male_last_names(people, families):
 # Call the function with both individuals and families
 check_male_last_names(people, families)
 
+def less_than_150(people):
+    for person in people:
+        birth_date_str = person.get('BIRTH', {}).get('BDATE', '')
+        death_date_str = person.get('DEATH', {}).get('DATE', '')
+
+        if birth_date_str:
+            birth_date = parse_date(birth_date_str)
+            if death_date_str:
+                death_date = parse_date(death_date_str)
+                age_at_death = (death_date - birth_date).days / 365.25
+                if age_at_death > 150:
+                    error_message = f"ERROR: INDIVIDUAL: US07: {person.get('INDI', '')}: bi{person.get('LINE_NUM', '')}: More than 150 years old - Birth {birth_date_str}: Death {death_date_str}."
+                    print(error_message)
+
+# Call the less_than_150 function
+less_than_150(people)
+
+
