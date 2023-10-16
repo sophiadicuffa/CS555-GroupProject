@@ -246,7 +246,6 @@ def check_marriage_before_death(people, families):
     return True
 
 
-# Your existing code to call the functions
 check_birth_before_marriage(people, families)
 check_marriage_before_death(people, families)
 
@@ -339,8 +338,6 @@ def is_divorce_before_death(individuals, families):
 
     return True
 
-
-# Call the function with both individuals and families
 is_divorce_before_death(people, families)
 
 
@@ -476,15 +473,18 @@ def check_birth_before_death_of_parents(people, families):
             child = next((person for person in people if person.get('INDI', '') == child_id), None)
             mother = next((person for person in people if person.get('INDI', '') == wife_id), None)
             father = next((person for person in people if person.get('INDI', '') == husband_id), None)
+            print(child)
 
             if child and mother and father:
-                child_birth_date = child.get("BIRT", {}).get("DATE", "")
+                
+                child_birth_date = child.get("BIRT", {}).get("BDATE", "")
                 mother_death_date = mother.get("DEAT", {}).get("DATE", "")
                 father_death_date = father.get("DEAT", {}).get("DATE", "")
 
                 if child_birth_date and mother_death_date:
                     child_birth_date_format = datetime.strptime(child_birth_date, "%d %b %Y")
                     mother_death_date_format = datetime.strptime(mother_death_date, "%d %b %Y")
+                    
 
                     if child_birth_date_format > mother_death_date_format:
                         error_message = f"ERROR: INDIVIDUAL: US09: {child_id}: Child born {child_birth_date_format.strftime('%d %b %Y')} after mother's death {mother_death_date_format.strftime('%d %b %Y')}"
