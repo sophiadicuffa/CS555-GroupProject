@@ -36,5 +36,50 @@ class TestFamilyFunctions(unittest.TestCase):
         expected_errors = "ERROR"
         self.assertEqual(check_birth_before_parents_marriage(people, families), expected_errors)
 
+    def test_less_than_150(self):
+        person = {
+            'INDI': 'I01',
+            'BIRTH': {'BDATE': '01 Jan 1950'},
+            'DEATH': {'DATE': '01 Jan 2000'}
+        }
+        people = [person]
+
+        import sys
+        from io import StringIO
+        captured_output = StringIO()
+        sys.stdout = captured_output
+
+        less_than_150(people)
+
+        sys.stdout = sys.__stdout__
+
+        expected_output = "" 
+        self.assertEqual(captured_output.getvalue(), expected_output)
+
+    def test_marriage_validity(self):
+        family = {
+            'FAM': 'F01',
+            'HUSB': 'I01',
+            'WIFE': 'I02',
+            'MARR': {'DATE': '01 Jan 2000'}
+        }
+        people = [
+            {'INDI': 'I01', 'BIRTH': {'BDATE': '01 Jan 1985'}},
+            {'INDI': 'I02', 'BIRTH': {'BDATE': '01 Jan 1987'}}
+        ]
+        families = [family]
+
+        import sys
+        from io import StringIO
+        captured_output = StringIO()
+        sys.stdout = captured_output
+
+        check_marriage_validity(people, families)
+
+        sys.stdout = sys.__stdout__
+
+        expected_output = ""  
+        self.assertEqual(captured_output.getvalue(), expected_output)
+
 if __name__ == '__main__':
     unittest.main()
