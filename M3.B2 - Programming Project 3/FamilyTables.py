@@ -566,14 +566,14 @@ def check_marriage_validity(people, families):
         wife_birth_date = get_birth_date(wife_id, people)
         marriage_date = parse_date(marriage_date_str)
 
-        if husband_birth_date and marriage_date and husband_birth_date > marriage_date:
+        if husband_birth_date and marriage_date and husband_birth_date > datetime.combine(marriage_date, datetime.min.time()):
             error_message = f"ERROR: INDIVIDUAL: US10: {husband_id}: Birthday {husband_birth_date.strftime('%d %b %Y')} should be at least 14 years before marriage in family {family.get('FAM', '')}."
             print(error_message)
 
-        if wife_birth_date and marriage_date and wife_birth_date > marriage_date:
+        if wife_birth_date and marriage_date and wife_birth_date > datetime.combine(marriage_date, datetime.min.time()):
             error_message = f"ERROR: INDIVIDUAL: US10: {wife_id}: Birthday {wife_birth_date.strftime('%d %b %Y')} should be at least 14 years before marriage in family {family.get('FAM', '')}."
             print(error_message)
 
-    # Call the function check_marriage_validity
-    check_marriage_validity(people, families)
+# Call the function check_marriage_validity
+check_marriage_validity(people, families)
     
