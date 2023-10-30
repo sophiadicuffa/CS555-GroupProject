@@ -1,6 +1,6 @@
 import unittest
 from datetime import datetime
-from FamilyTables import check_fewer_than_15_siblings, check_birth_before_parents_marriage, birth_before_death_of_parents, check_male_last_names, less_than_150, check_marriage_validity
+from FamilyTables import check_fewer_than_15_siblings, check_birth_before_parents_marriage, birth_before_death_of_parents, check_male_last_names, less_than_150, check_marriage_validity, check_sibling_married_to_child
 
 class TestFamilyFunctions(unittest.TestCase):
     def test_check_fewer_than_15_siblings(self):
@@ -81,35 +81,58 @@ class TestFamilyFunctions(unittest.TestCase):
         expected_output = ""  
         self.assertEqual(captured_output.getvalue(), expected_output)
 
+        # Test case for a parent's sibling being married to their child
+    def test_sibling_married_to_child(self):
+        fake_family = {
+            "FAM": "F101",
+            "HUSB": "I50",  # Father
+            "WIFE": "I51",  # Mother
+            "MARR": {"DATE": "01 JAN 1990"},  # Marriage date of parents
+            "CHIL": ["I52"],  # Child
+        }
+
+        fake_aunt = {
+            "INDI": "I52",
+            "NAME": "Aunt Name",
+            "SEX": "F",  # Female
+            "FAMC": "F102",  # Parent's family ID
+        }
+
+        people = [fake_aunt]
+        families = [fake_family]
+
+        # Assert that the function detects the error
+        self.assertFalse(check_sibling_married_to_child(people, families))
+
     class TestBirthBeforeDeathOfParents(unittest.TestCase):
-    def test_birth_before_death_pass(self):
-        # Test case for children born before parents' deaths (pass scenario)
-        people = [
-            {
-                'INDI': 'I1',
-                'BIRT': {'DATE': '10 MAR 1980'},
-                'DEAT': {'DATE': '15 MAY 2018'}
-            },
-            {
-                'INDI': 'I2',
-                'BIRT': {'DATE': '10 MAR 1990'},
-                'DEAT': {'DATE': '15 MAY 2010'}
-            },
-            {
-                'INDI': 'I3',
-                'BIRT': {'DATE': '10 MAR 2005'},
-                'DEAT': {}  
-            }
-        ]
-        families = [
-            {
-                'HUSB': 'I1',
-                'WIFE': 'I2',
-                'CHIL': ['I3']
-            }
-        ]
-        result = birth_before_death_of_parents(people, families)
-        self.assertFalse(result)
+        def test_birth_before_death_pass(self):
+            # Test case for children born before parents' deaths (pass scenario)
+            people = [
+                {
+                    'INDI': 'I1',
+                    'BIRT': {'DATE': '10 MAR 1980'},
+                    'DEAT': {'DATE': '15 MAY 2018'}
+                },
+                {
+                    'INDI': 'I2',
+                    'BIRT': {'DATE': '10 MAR 1990'},
+                    'DEAT': {'DATE': '15 MAY 2010'}
+                },
+                {
+                    'INDI': 'I3',
+                    'BIRT': {'DATE': '10 MAR 2005'},
+                    'DEAT': {}  
+                }
+            ]
+            families = [
+                {
+                    'HUSB': 'I1',
+                    'WIFE': 'I2',
+                    'CHIL': ['I3']
+                }
+            ]
+            result = birth_before_death_of_parents(people, families)
+            self.assertFalse(result)
 
 
     def test_three_children_pass(self):

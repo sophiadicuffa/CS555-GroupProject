@@ -596,3 +596,26 @@ def check_marriage_validity(people, families):
 # Call the function check_marriage_validity
 check_marriage_validity(people, families)
     
+
+# Spint 3 - Aunts and Uncles
+
+def check_sibling_married_to_child(people, families):
+    for person in people:
+        if 'FAMS' in person:
+            siblings_ids = person['FAMS']  # Get IDs of siblings
+            for sibling_id in siblings_ids:
+                sibling = next((p for p in people if p.get('INDI', '') == sibling_id), None)  # Get sibling's details
+                if sibling and 'FAMS' in sibling:
+                    spouse_ids = sibling['FAMS']  # Get IDs of sibling's spouses
+                    for spouse_id in spouse_ids:
+                        spouse = next((p for p in people if p.get('INDI', '') == spouse_id), None)  # Get spouse's details
+                        if spouse and spouse.get('FAMC', '') == person.get('FAMC', ''):  # Check if spouse is the child
+                            error_message = f"ERROR: INDIVIDUAL: US18: {sibling_id}: Sibling is married to their child {person.get('INDI', '')}."
+                            print(error_message)
+                            return False
+    return True
+
+# Call the function to check if a parent's sibling is married to their child
+check_sibling_married_to_child(people, families)
+
+
