@@ -103,12 +103,17 @@ people = sorted(people, key=lambda k: k['INDI'])
 families = sorted(families, key=lambda k: k['FAM'])
 
 # Function to find children for a family
+
+
 def find_children(family_id):
     return [person for person in people if person.get('FAMC') == family_id]
 
 # Function to find parents for a family
+
+
 def find_parents(family_id):
     return [person for person in people if family_id in person.get('FAMS', [])]
+
 
 def parse_date(date_str):
     try:
@@ -210,11 +215,13 @@ def check_birth_before_marriage(people, families):
 
         if husband_birth_date and wife_birth_date and marriage_date:
             if husband_birth_date > marriage_date_format:
-                error_message = f"ERROR: FAMILY: US02: {family.get('FAM', '')}: Husband's birthday of {husband_birth_date} is after marriage date of {marriage_date_format}."
+                error_message = f"ERROR: FAMILY: US02: {family.get('FAM', '')}: Husband's birthday of {
+                    husband_birth_date} is after marriage date of {marriage_date_format}."
                 print(error_message)
                 return False
             elif wife_birth_date > marriage_date_format:
-                error_message = f"ERROR: FAMILY: US02: {family.get('FAM', '')}: Wife's birthday of {wife_birth_date} is after marriage date of {marriage_date_format}."
+                error_message = f"ERROR: FAMILY: US02: {family.get('FAM', '')}: Wife's birthday of {
+                    wife_birth_date} is after marriage date of {marriage_date_format}."
                 print(error_message)
                 return False
     return True
@@ -235,12 +242,14 @@ def check_marriage_before_death(people, families):
         marriage_date_format = datetime.strptime(marriage_date, "%d %b %Y")
 
         if husband_death_date and husband_death_date < marriage_date_format:
-            error_message = f"ERROR: FAMILY: US05: {family.get('FAM', '')}: Husband's death of {husband_death_date} is before marriage date of {marriage_date_format}"
+            error_message = f"ERROR: FAMILY: US05: {family.get('FAM', '')}: Husband's death of {
+                husband_death_date} is before marriage date of {marriage_date_format}"
             print(error_message)
             return False
 
         if wife_death_date and wife_death_date < marriage_date_format:
-            error_message = f"ERROR: FAMILY: US05: {family.get('FAM', '')}: Wife's death of {wife_death_date} is before marriage date of {marriage_date_format}"
+            error_message = f"ERROR: FAMILY: US05: {family.get('FAM', '')}: Wife's death of {
+                wife_death_date} is before marriage date of {marriage_date_format}"
             print(error_message)
             return False
     return True
@@ -268,7 +277,8 @@ def is_birth_before_death(individual):
         death_date_format = datetime.strptime(death_date, "%d %b %Y")
 
         if birth_date_format > death_date_format:
-            error_message = f"ERROR: INDIVIDUAL: US03: {indi_id}: Died {death_date_format.strftime('%d %b %Y')} before born {birth_date_format.strftime('%d %b %Y')}"
+            error_message = f"ERROR: INDIVIDUAL: US03: {indi_id}: Died {death_date_format.strftime(
+                '%d %b %Y')} before born {birth_date_format.strftime('%d %b %Y')}"
             print(error_message)
             checked_birth_before_death.add(indi_id)
 
@@ -316,7 +326,8 @@ def is_divorce_before_death(individuals, families):
                         divorce_date, "%d %b %Y")
 
                     if divorce_date_format > death_date_format:
-                        error_message = f"ERROR: FAMILY: US06: {family.get('FAM', '')}: Divorced {divorce_date_format.strftime('%Y-%m-%d')} after husband's death on {death_date_format.strftime('%Y-%m-%d')}"
+                        error_message = f"ERROR: FAMILY: US06: {family.get('FAM', '')}: Divorced {divorce_date_format.strftime(
+                            '%Y-%m-%d')} after husband's death on {death_date_format.strftime('%Y-%m-%d')}"
                         print(error_message)
                         return False
 
@@ -332,11 +343,13 @@ def is_divorce_before_death(individuals, families):
                         divorce_date, "%d %b %Y")
 
                     if divorce_date_format > death_date_format:
-                        error_message = f"ERROR: FAMILY: US06: {family.get('FAM', '')}: Divorced {divorce_date_format.strftime('%Y-%m-%d')} after wife's death on {death_date_format.strftime('%Y-%m-%d')}"
+                        error_message = f"ERROR: FAMILY: US06: {family.get('FAM', '')}: Divorced {divorce_date_format.strftime(
+                            '%Y-%m-%d')} after wife's death on {death_date_format.strftime('%Y-%m-%d')}"
                         print(error_message)
                         return False
 
     return True
+
 
 is_divorce_before_death(people, families)
 
@@ -417,24 +430,17 @@ def check_fewer_than_15_siblings(people, families):
 
         if len(children_ids) >= 15:
             family_id = family.get('FAM', '')
-            error_message = f"ERROR: FAMILY: US15: {family_id}: More than 15 siblings in the family."
+            error_message = f"ERROR: FAMILY: US15: {
+                family_id}: More than 15 siblings in the family."
             errors.append(error_message)
             print(error_message)
     return errors
 
 
-# Create a fake family with more than 15 siblings to test
-fake_family = {
-    'FAM': 'F01 (FAKE FAMILY)',
-    'HUSB': 'I01',
-    'WIFE': 'I02',
-    'CHIL': ['I03', 'I04', 'I05', 'I06', 'I07', 'I08', 'I09', 'I10', 'I11', 'I12', 'I13', 'I14', 'I15', 'I16', 'I17', 'I18', 'I19', 'I20']
-}
-families.append(fake_family)
-
 check_fewer_than_15_siblings(people, families)
 
 # PAIR PROGRAMMING - SD - Birth before marriage of parents
+
 
 def check_birth_before_parents_marriage(people, families):
     for family in families:
@@ -456,12 +462,15 @@ def check_birth_before_parents_marriage(people, families):
                     child_birth_date_format = datetime.strptime(
                         child_birth_date, "%d %b %Y").date()
                     if child_birth_date_format < marriage_date_format:
-                        error_message = f"ERROR: INDIVIDUAL: US08: {child.get('INDI', '')}: Born {child_birth_date_format.strftime('%Y-%m-%d')} before parents' marriage on {marriage_date_format.strftime('%Y-%m-%d')}"
+                        error_message = f"ERROR: INDIVIDUAL: US08: {child.get('INDI', '')}: Born {child_birth_date_format.strftime(
+                            '%Y-%m-%d')} before parents' marriage on {marriage_date_format.strftime('%Y-%m-%d')}"
                         print(error_message)
-                        
+
     return "ERROR"
 
+
 check_birth_before_parents_marriage(people, families)
+
 
 def birth_before_death_of_parents(people, families):
     for family in families:
@@ -488,18 +497,23 @@ def birth_before_death_of_parents(people, families):
                 if wife_death_date:
                     wife_death_date_format = wife_death_date.date()
                     if child_birth_date_format > wife_death_date_format:
-                        error_message = f"ERROR: INDIVIDUAL: US09: {child_id}: Child born {child_birth_date_format.strftime('%d %b %Y')} after mother's death {wife_death_date.strftime('%d %b %Y')}"
+                        error_message = f"ERROR: INDIVIDUAL: US09: {child_id}: Child born {child_birth_date_format.strftime(
+                            '%d %b %Y')} after mother's death {wife_death_date.strftime('%d %b %Y')}"
                         print(error_message)
 
                 if husband_death_date:
                     # Calculate the date nine months after the death of the father
-                    nine_months_after_death = husband_death_date + timedelta(days=270)
+                    nine_months_after_death = husband_death_date + \
+                        timedelta(days=270)
                     nine_months_after_death_date = nine_months_after_death.date()
                     if child_birth_date_format > nine_months_after_death_date:
-                        error_message = f"ERROR: INDIVIDUAL: US09: {child_id}: Child born {child_birth_date_format.strftime('%d %b %Y')} after nine months of father's death {husband_death_date.strftime('%d %b %Y')}"
+                        error_message = f"ERROR: INDIVIDUAL: US09: {child_id}: Child born {child_birth_date_format.strftime(
+                            '%d %b %Y')} after nine months of father's death {husband_death_date.strftime('%d %b %Y')}"
                         print(error_message)
 
+
 birth_before_death_of_parents(people, families)
+
 
 def check_male_last_names(people, families):
     for family in families:
@@ -527,14 +541,17 @@ def check_male_last_names(people, families):
                     (person.get('NAME', '').split('/')[1] for person in people if person.get('INDI', '') == child_id), '')
 
                 if child_last_name != husband_last_name:
-                    error_message = f"ERROR: FAMILY: US16: {family.get('FAM', '')}: Male child ({child_id}) has a different last name ({child_last_name}) than the husband ({husband_id}) ({husband_last_name})."
+                    error_message = f"ERROR: FAMILY: US16: {family.get('FAM', '')}: Male child ({child_id}) has a different last name ({
+                        child_last_name}) than the husband ({husband_id}) ({husband_last_name})."
                     print(error_message)
                     return False
 
     return True
 
+
 # Call the function with both individuals and families
 check_male_last_names(people, families)
+
 
 def less_than_150(people):
     for person in people:
@@ -547,10 +564,41 @@ def less_than_150(people):
                 death_date = parse_date(death_date_str)
                 age_at_death = (death_date - birth_date).days / 365.25
                 if age_at_death > 150:
-                    error_message = f"ERROR: INDIVIDUAL: US07: {person.get('INDI', '')}: bi{person.get('LINE_NUM', '')}: More than 150 years old - Birth {birth_date_str}: Death {death_date_str}."
+                    error_message = f"ERROR: INDIVIDUAL: US07: {person.get('INDI', '')}: bi{person.get(
+                        'LINE_NUM', '')}: More than 150 years old - Birth {birth_date_str}: Death {death_date_str}."
                     print(error_message)
+
 
 # Call the less_than_150 function
 less_than_150(people)
 
 
+# Sprint 3 - Aunts and Uncles
+
+# Function to check if an aunt (sister of someone's mother) is married to her niece or nephew
+def check_aunt_married_to_niece_or_nephew(people, families):
+    for person in people:
+        if 'MARR' in person:
+            mother_id = person['FAMC']
+            mother = next((p for p in people if p.get(
+                'INDI', '') == mother_id), None)
+
+            if mother:
+                mother_siblings_ids = mother.get('FAMS', [])
+                for sibling_id in mother_siblings_ids:
+                    sibling = next((p for p in people if p.get(
+                        'INDI', '') == sibling_id), None)
+                    if sibling:
+                        sibling_spouse_ids = sibling.get('FAMS', [])
+                        for spouse_id in sibling_spouse_ids:
+                            if spouse_id in mother_siblings_ids:
+                                error_message = f"ERROR: INDIVIDUAL: US20: {
+                                    sibling_id}: Aunt (sister of mother) is married to her niece/nephew {spouse_id}."
+                                print(error_message)
+                                return False
+
+    return True
+
+
+# Call the function to check if aunt is married to her niece/nephew
+check_aunt_married_to_niece_or_nephew(people, families)

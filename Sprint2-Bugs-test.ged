@@ -2,7 +2,7 @@
 1 SOUR Family Echo
 2 WWW http://www.familyecho.com/
 1 FILE My Family
-1 DATE 30 OCT 2023
+1 DATE 4 OCT 2023
 1 DEST ANSTFILE
 1 GEDC
 2 VERS 5.5.1
@@ -21,7 +21,7 @@
 2 DATE 6 JUN 2002
 1 FAMC @F1@
 0 @I2@ INDI
-1 NAME Delio /DiCuffa/
+1 NAME Delio /DiCuffa II/
 2 GIVN Delio
 2 SURN DiCuffa
 2 _MARNM DiCuffa
@@ -98,24 +98,6 @@
 1 BIRT
 2 DATE 4 MAY 2004
 1 FAMC @F1@
-0 @I10@ INDI
-1 NAME Ida /Brandwood/
-2 GIVN Ida
-2 SURN Brandwood
-2 _MARNM Beller
-1 SEX F
-1 BIRT
-2 DATE 10 APR 1967
-1 FAMC @F4@
-0 @I11@ INDI
-1 NAME Salvatore /DiCuffa/
-2 GIVN Salvatore
-2 SURN DiCuffa
-2 _MARNM DiCuffa
-1 SEX M
-1 BIRT
-2 DATE 6 MAY 1960
-1 FAMC @F3@
 0 @F1@ FAM
 1 HUSB @I2@
 1 WIFE @I3@
@@ -140,7 +122,6 @@
 1 HUSB @I8@
 1 WIFE @I4@
 1 CHIL @I2@
-1 CHIL @I11@
 1 _CURRENT N
 1 _PRIMARY N
 0 @F5@ FAM
@@ -155,9 +136,8 @@
 1 HUSB @I6@
 1 WIFE @I7@
 1 CHIL @I3@
-1 CHIL @I10@
 1 MARR
-2 DATE 8 MAR 1961
+2 DATE 8 MAR 2000
 2 PLAC Brooklyn
 1 _CURRENT Y
 1 _PRIMARY Y
