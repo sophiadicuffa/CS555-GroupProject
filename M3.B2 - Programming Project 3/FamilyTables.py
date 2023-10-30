@@ -572,33 +572,27 @@ def less_than_150(people):
 # Call the less_than_150 function
 less_than_150(people)
 
+def check_marriage_validity(people, families):
+    for family in families:
+        husband_id = family.get('HUSB', '')
+        wife_id = family.get('WIFE', '')
+        marriage_date_str = family.get('MARR', {}).get('DATE', '')
+        
+        if not husband_id or not wife_id or not marriage_date_str:
+            continue
 
-# Sprint 3 - Aunts and Uncles
+        husband_birth_date = get_birth_date(husband_id, people)
+        wife_birth_date = get_birth_date(wife_id, people)
+        marriage_date = parse_date(marriage_date_str)
 
-# Function to check if an aunt (sister of someone's mother) is married to her niece or nephew
-def check_aunt_married_to_niece_or_nephew(people, families):
-    for person in people:
-        if 'MARR' in person:
-            mother_id = person['FAMC']
-            mother = next((p for p in people if p.get(
-                'INDI', '') == mother_id), None)
+        if husband_birth_date and marriage_date and husband_birth_date > datetime.combine(marriage_date, datetime.min.time()):
+            error_message = f"ERROR: INDIVIDUAL: US10: {husband_id}: Birthday {husband_birth_date.strftime('%d %b %Y')} should be at least 14 years before marriage in family {family.get('FAM', '')}."
+            print(error_message)
 
-            if mother:
-                mother_siblings_ids = mother.get('FAMS', [])
-                for sibling_id in mother_siblings_ids:
-                    sibling = next((p for p in people if p.get(
-                        'INDI', '') == sibling_id), None)
-                    if sibling:
-                        sibling_spouse_ids = sibling.get('FAMS', [])
-                        for spouse_id in sibling_spouse_ids:
-                            if spouse_id in mother_siblings_ids:
-                                error_message = f"ERROR: INDIVIDUAL: US20: {
-                                    sibling_id}: Aunt (sister of mother) is married to her niece/nephew {spouse_id}."
-                                print(error_message)
-                                return False
+        if wife_birth_date and marriage_date and wife_birth_date > datetime.combine(marriage_date, datetime.min.time()):
+            error_message = f"ERROR: INDIVIDUAL: US10: {wife_id}: Birthday {wife_birth_date.strftime('%d %b %Y')} should be at least 14 years before marriage in family {family.get('FAM', '')}."
+            print(error_message)
 
-    return True
-
-
-# Call the function to check if aunt is married to her niece/nephew
-check_aunt_married_to_niece_or_nephew(people, families)
+# Call the function check_marriage_validity
+check_marriage_validity(people, families)
+    
