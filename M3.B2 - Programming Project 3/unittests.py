@@ -1,6 +1,6 @@
 import unittest
 from datetime import datetime
-from FamilyTables import check_fewer_than_15_siblings, check_birth_before_parents_marriage, birth_before_death_of_parents, check_male_last_names, less_than_150, check_marriage_validity, check_sibling_married_to_child
+from FamilyTables import check_fewer_than_15_siblings, check_birth_before_parents_marriage, birth_before_death_of_parents, check_male_last_names, less_than_150, check_marriage_validity, check_sibling_married_to_child, check_siblings_not_married, check_unique_ids
 
 class TestFamilyFunctions(unittest.TestCase):
     def test_check_fewer_than_15_siblings(self):
@@ -238,6 +238,44 @@ class TestFamilyFunctions(unittest.TestCase):
         ]
         result = check_male_last_names(people, families)
         self.assertTrue(result) 
+
+    def test_check_siblings_not_married(self):
+            individuals = [
+                {"INDI": "I1", "NAME": "Alice Smith", "FAMC": "F1"},
+                {"INDI": "I2", "NAME": "Bob Smith", "FAMC": "F1"},
+                {"INDI": "I3", "NAME": "Charlie Brown", "FAMC": "F2"},
+                {"INDI": "I4", "NAME": "Dana Brown", "FAMC": "F2"},
+                {"INDI": "I5", "NAME": "Edward Stone", "FAMC": "F3"},
+                {"INDI": "I6", "NAME": "Fiona Clear", "FAMC": "F4"}
+            ]
+
+            families = [
+                {"FAM": "F5", "HUSB": "I1", "WIFE": "I2"},
+                {"FAM": "F6", "HUSB": "I3", "WIFE": "I4"},
+                {"FAM": "F7", "HUSB": "I5", "WIFE": "I6"}
+            ]
+
+            actual_errors = check_siblings_not_married(individuals, families)
+
+            expected_errors = [
+                "ERROR: FAMILY: US18: F5: Husband (I1) and Wife (I2) are siblings and therefore cannot be married."
+            ]
+
+            self.assertEqual(actual_errors, expected_errors)
+
+    def test_unique_ids(self):
+        
+        individuals_unique = [{"INDI": "I1"}, {"INDI": "I2"}, {"INDI": "I3"}]
+        families_unique = [{"FAM": "F1"}, {"FAM": "F2"}]
+        self.assertTrue(check_unique_ids(individuals_unique, families_unique))
+
+        individuals_duplicate_individual = [{"INDI": "I1"}, {"INDI": "I1"}, {"INDI": "I3"}]
+        families_unique = [{"FAM": "F1"}, {"FAM": "F2"}]
+        self.assertFalse(check_unique_ids(individuals_duplicate_individual, families_unique))
+
+        individuals_unique = [{"INDI": "I1"}, {"INDI": "I2"}]
+        families_duplicate_family = [{"FAM": "F1"}, {"FAM": "F1"}]
+        self.assertFalse(check_unique_ids(individuals_unique, families_duplicate_family)) 
 
 
 if __name__ == '__main__':
