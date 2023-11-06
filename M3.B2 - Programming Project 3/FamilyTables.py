@@ -618,4 +618,27 @@ def check_sibling_married_to_child(people, families):
 # Call the function to check if a parent's sibling is married to their child
 check_sibling_married_to_child(people, families)
 
+def check_gender(people, families):
+    for family in families:
+        husband_id = family.get('HUSB', '')
+        wife_id = family.get('WIFE', '')
+
+        if husband_id:
+            husband = next((person for person in people if person.get('INDI', '') == husband_id), None)
+            if husband:
+                husband_gender = husband.get('SEX', '')
+                if husband_gender != 'M':
+                    error_message = f"ERROR: INDIVIDUAL: US21: {husband_id}: Should be a male."
+                    print(error_message)
+
+        if wife_id:
+            wife = next((person for person in people if person.get('INDI', '') == wife_id), None)
+            if wife:
+                wife_gender = wife.get('SEX', '')
+                if wife_gender != 'F':
+                    error_message = f"ERROR: INDIVIDUAL: US21: {wife_id}: Should be a female."
+                    print(error_message)
+
+# Call the check_gender function
+check_gender(people, families)
 
