@@ -615,7 +615,36 @@ def check_sibling_married_to_child(people, families):
                             return False
     return True
 
-# Call the function to check if a parent's sibling is married to their child
 check_sibling_married_to_child(people, families)
+
+# Sprint 3 -  List Siblings by Age
+
+def list_siblings_by_age(people, families):
+    siblings_by_age = {}  # Dictionary to store siblings grouped by family and ordered by age
+
+    for family in families:
+        children_ids = family.get('CHIL', [])  # Get IDs of children in the family
+        children = [person for person in people if person.get('INDI', '') in children_ids]  # Get children's details
+
+        if children:
+            # Sort children by age in descending order
+            children.sort(key=lambda x: datetime.strptime(
+                x.get('BIRTH', {}).get('BDATE', ''), "%d %b %Y"), reverse=True)
+
+            siblings_by_age[family.get('FAM', '')] = children  # Add sorted children to the dictionary
+
+    # Print siblings grouped by family and ordered by age
+    for family_id, siblings in siblings_by_age.items():
+        print(f"Family ID: {family_id}")
+        for sibling in siblings:
+            i = 1
+            indi_id = sibling.get('INDI', '')
+            name = sibling.get('NAME', '')
+            birth_date_str = sibling.get('BIRTH', {}).get('BDATE', '')
+            birth_date = datetime.strptime(birth_date_str, "%d %b %Y").strftime("%Y-%m-%d")
+            print(f"{i}, {name}")
+
+# Call the function to list siblings by age
+list_siblings_by_age(people, families)
 
 
