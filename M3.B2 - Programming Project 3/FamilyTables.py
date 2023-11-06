@@ -647,4 +647,72 @@ def list_siblings_by_age(people, families):
 # Call the function to list siblings by age
 list_siblings_by_age(people, families)
 
+def check_gender(people, families):
+    for family in families:
+        husband_id = family.get('HUSB', '')
+        wife_id = family.get('WIFE', '')
 
+        if husband_id:
+            husband = next((person for person in people if person.get('INDI', '') == husband_id), None)
+            if husband:
+                husband_gender = husband.get('SEX', '')
+                if husband_gender != 'M':
+                    error_message = f"ERROR: INDIVIDUAL: US21: {husband_id}: Should be a male."
+                    print(error_message)
+
+        if wife_id:
+            wife = next((person for person in people if person.get('INDI', '') == wife_id), None)
+            if wife:
+                wife_gender = wife.get('SEX', '')
+                if wife_gender != 'F':
+                    error_message = f"ERROR: INDIVIDUAL: US21: {wife_id}: Should be a female."
+                    print(error_message)
+
+# Call the check_gender function
+check_gender(people, families)
+
+def check_siblings_not_married(people, families):
+    errors = []
+    for family in families:
+        husband_id = family.get('HUSB', '')
+        wife_id = family.get('WIFE', '')
+        husband = next((p for p in people if p.get('INDI') == husband_id), None)
+        wife = next((p for p in people if p.get('INDI') == wife_id), None)
+
+        if husband and wife:
+            husband_famc = husband.get('FAMC')
+            wife_famc = wife.get('FAMC')
+
+            if husband_famc and wife_famc and husband_famc == wife_famc:
+                error_message = f"ERROR: FAMILY: US18: {family.get('FAM', '')}: Siblings {husband_id} and {wife_id} are married to each other."
+                errors.append(error_message)
+    
+    for error in errors:
+        print(error)
+    return not errors 
+
+check_siblings_not_married(people, families)
+
+def check_unique_ids(individuals, families):
+    individual_ids = set()
+    family_ids = set()
+
+    for individual in individuals:
+        indi_id = individual.get('INDI', '')
+        if indi_id in individual_ids:
+            error_message = f"ERROR: INDIVIDUAL: US22: Duplicate individual ID {indi_id} found."
+            print(error_message)
+            return False
+        individual_ids.add(indi_id)
+
+    for family in families:
+        fam_id = family.get('FAM', '')
+        if fam_id in family_ids:
+            error_message = f"ERROR: FAMILY: US22: Duplicate family ID {fam_id} found."
+            print(error_message)
+            return False
+        family_ids.add(fam_id)
+
+    return True
+
+check_unique_ids(people, families)
