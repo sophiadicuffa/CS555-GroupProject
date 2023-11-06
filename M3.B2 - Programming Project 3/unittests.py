@@ -1,6 +1,8 @@
 import unittest
 from datetime import datetime
-from FamilyTables import check_fewer_than_15_siblings, check_birth_before_parents_marriage, birth_before_death_of_parents, check_male_last_names, less_than_150, check_marriage_validity, check_sibling_married_to_child, check_siblings_not_married, check_unique_ids
+import sys
+from io import StringIO
+from FamilyTables import list_siblings_by_age, check_fewer_than_15_siblings, check_birth_before_parents_marriage, birth_before_death_of_parents, check_male_last_names, less_than_150, check_marriage_validity, check_sibling_married_to_child, check_siblings_not_married, check_unique_ids
 
 class TestFamilyFunctions(unittest.TestCase):
     def test_check_fewer_than_15_siblings(self):
@@ -277,6 +279,35 @@ class TestFamilyFunctions(unittest.TestCase):
         families_duplicate_family = [{"FAM": "F1"}, {"FAM": "F1"}]
         self.assertFalse(check_unique_ids(individuals_unique, families_duplicate_family)) 
 
+    def test_list_siblings_by_age(self):
+        # Sample data with random names for testing
+        people = [
+            {"NAME": "SOPHIA", "BIRTH": {"BDATE": "15 FEB 1990"}, "FAMC": "F1"},
+            {"NAME": "GRACE", "BIRTH": {"BDATE": "20 JAN 1985"}, "FAMC": "F1"},
+        ]
+
+        families = [
+            {"FAM": "F1", "CHIL": ["ID1", "ID2"]},
+        ]
+        expected_output = [
+            "Siblings Sorted by Age:",
+            "  Family ID: F1",
+            "     1, GRACE, Birth Date: 20 JAN 1985",
+            "     2, SOPHIA, Birth Date: 15 FEB 1990",
+        ]
+
+        original_stdout = sys.stdout
+        sys.stdout = StringIO()
+
+        # Call the function with sample data
+        list_siblings_by_age(people, families)
+
+        # Get the printed output
+        printed_output = sys.stdout.getvalue()
+
+        sys.stdout = original_stdout
+
+        self.assertEqual(printed_output.strip(), '\n'.join(expected_output))
 
 if __name__ == '__main__':
     unittest.main()

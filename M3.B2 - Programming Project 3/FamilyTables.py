@@ -620,29 +620,30 @@ check_sibling_married_to_child(people, families)
 # Sprint 3 -  List Siblings by Age
 
 def list_siblings_by_age(people, families):
+    print(f"Siblings Sorted by Age:")
     siblings_by_age = {}  # Dictionary to store siblings grouped by family and ordered by age
 
     for family in families:
-        children_ids = family.get('CHIL', [])  # Get IDs of children in the family
-        children = [person for person in people if person.get('INDI', '') in children_ids]  # Get children's details
+        family_id = family.get('FAM', '')
+        children = find_children(family_id)  # Get children for the family using find_children function
 
         if children:
             # Sort children by age in descending order
             children.sort(key=lambda x: datetime.strptime(
-                x.get('BIRTH', {}).get('BDATE', ''), "%d %b %Y"), reverse=True)
+                x.get('BIRTH', {}).get('BDATE', '01 JAN 1900'), "%d %b %Y"))
 
-            siblings_by_age[family.get('FAM', '')] = children  # Add sorted children to the dictionary
+            siblings_by_age[family_id] = children  # Add sorted children to the dictionary
 
     # Print siblings grouped by family and ordered by age
     for family_id, siblings in siblings_by_age.items():
-        print(f"Family ID: {family_id}")
+        print(f"  Family ID: {family_id}")
+        i = 1
         for sibling in siblings:
-            i = 1
-            indi_id = sibling.get('INDI', '')
             name = sibling.get('NAME', '')
-            birth_date_str = sibling.get('BIRTH', {}).get('BDATE', '')
-            birth_date = datetime.strptime(birth_date_str, "%d %b %Y").strftime("%Y-%m-%d")
-            print(f"{i}, {name}")
+            birth_date = sibling.get('BIRTH', {}).get('BDATE', 'Unknown')
+            print(f"     {i}, {name}, Birth Date: {birth_date}")
+            i += 1
+
 
 # Call the function to list siblings by age
 list_siblings_by_age(people, families)
