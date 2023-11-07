@@ -595,9 +595,6 @@ def check_marriage_validity(people, families):
 
 # Call the function check_marriage_validity
 check_marriage_validity(people, families)
-    
-
-# Spint 3 - Aunts and Uncles
 
 def check_sibling_married_to_child(people, families):
     for person in people:
@@ -640,13 +637,40 @@ def list_siblings_by_age(people, families):
         i = 1
         for sibling in siblings:
             name = sibling.get('NAME', '')
-            birth_date = sibling.get('BIRTH', {}).get('BDATE', 'Unknown')
-            print(f"     {i}, {name}, Birth Date: {birth_date}")
+            print(f"     {i}, {name}")
             i += 1
+    return True
 
 
 # Call the function to list siblings by age
 list_siblings_by_age(people, families)
+
+
+def check_unique_name_and_birth(people):
+    name_birth_dict = {} 
+    errors = []
+
+    for person in people:
+        name = person.get('NAME', '')
+        birth_date = person.get('BIRTH', {}).get('BDATE', '')
+
+        if name and birth_date:
+            name_birth_key = (name, birth_date)
+            if name_birth_key in name_birth_dict:
+                error_message = f"ERROR: INDIVIDUAL: US23: Duplicate individual found with the same name '{name}' and birthdate '{birth_date}'."
+                errors.append(error_message)
+            else:
+                name_birth_dict[name_birth_key] = person['INDI']
+
+    for error in errors:
+        print(error)
+
+    return not errors
+
+if check_unique_name_and_birth(people):
+    print("No individuals with the same name and birthdate found.")
+else:
+    print("Duplicate individuals with the same name and birthdate found.")
 
 def check_gender(people, families):
     for family in families:

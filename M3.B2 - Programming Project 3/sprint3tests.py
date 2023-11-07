@@ -4,7 +4,7 @@ from datetime import datetime, date
 from io import StringIO
 
 # Import the check_gender function from your FamilyTables module
-from FamilyTables import check_gender, calculate_age, check_siblings_not_married, check_unique_ids
+from FamilyTables import check_unique_name_and_birth, check_gender, calculate_age, check_siblings_not_married, check_unique_ids, list_siblings_by_age, find_children
 
 class TestFamilyFunctions(unittest.TestCase):
     
@@ -85,6 +85,29 @@ class TestFamilyFunctions(unittest.TestCase):
         individuals_unique = [{"INDI": "I1"}, {"INDI": "I2"}]
         families_duplicate_family = [{"FAM": "F1"}, {"FAM": "F1"}]
         self.assertFalse(check_unique_ids(individuals_unique, families_duplicate_family)) 
+    
+    def test_list_siblings_by_age(self):
+        people = {} 
+        families = [
+            {'FAM': 'F1', 'children': [
+                {'NAME': 'John', 'BIRTH': {'BDATE': '01 JAN 1990'}},
+                {'NAME': 'Alice', 'BIRTH': {'BDATE': '01 JAN 1985'}}
+            ]},
+            {'FAM': 'F2', 'children': [
+                {'NAME': 'Bob', 'BIRTH': {'BDATE': '01 JAN 1980'}},
+                {'NAME': 'Eve', 'BIRTH': {'BDATE': '01 JAN 1995'}}
+            ]}
+        ]
+
+        result = list_siblings_by_age(people, families)
+        self.assertTrue(result)
+
+    def test_unique_name_and_birth(self):
+        people = [
+            {'INDI': '1', 'NAME': 'John Doe', 'BIRTH': {'BDATE': '2000-01-01'}},
+            {'INDI': '2', 'NAME': 'John Doe', 'BIRTH': {'BDATE': '2000-01-01'}}
+        ]
+        self.assertFalse(check_unique_name_and_birth(people))
 
 if __name__ == '__main__':
     unittest.main()
