@@ -572,12 +572,13 @@ def less_than_150(people):
 # Call the less_than_150 function
 less_than_150(people)
 
+
 def check_marriage_validity(people, families):
     for family in families:
         husband_id = family.get('HUSB', '')
         wife_id = family.get('WIFE', '')
         marriage_date_str = family.get('MARR', {}).get('DATE', '')
-        
+
         if not husband_id or not wife_id or not marriage_date_str:
             continue
 
@@ -586,50 +587,65 @@ def check_marriage_validity(people, families):
         marriage_date = parse_date(marriage_date_str)
 
         if husband_birth_date and marriage_date and husband_birth_date > datetime.combine(marriage_date, datetime.min.time()):
-            error_message = f"ERROR: INDIVIDUAL: US10: {husband_id}: Birthday {husband_birth_date.strftime('%d %b %Y')} should be at least 14 years before marriage in family {family.get('FAM', '')}."
+            error_message = f"ERROR: INDIVIDUAL: US10: {husband_id}: Birthday {husband_birth_date.strftime(
+                '%d %b %Y')} should be at least 14 years before marriage in family {family.get('FAM', '')}."
             print(error_message)
 
         if wife_birth_date and marriage_date and wife_birth_date > datetime.combine(marriage_date, datetime.min.time()):
-            error_message = f"ERROR: INDIVIDUAL: US10: {wife_id}: Birthday {wife_birth_date.strftime('%d %b %Y')} should be at least 14 years before marriage in family {family.get('FAM', '')}."
+            error_message = f"ERROR: INDIVIDUAL: US10: {wife_id}: Birthday {wife_birth_date.strftime(
+                '%d %b %Y')} should be at least 14 years before marriage in family {family.get('FAM', '')}."
             print(error_message)
+
 
 # Call the function check_marriage_validity
 check_marriage_validity(people, families)
+
 
 def check_sibling_married_to_child(people, families):
     for person in people:
         if 'FAMS' in person:
             siblings_ids = person['FAMS']  # Get IDs of siblings
             for sibling_id in siblings_ids:
-                sibling = next((p for p in people if p.get('INDI', '') == sibling_id), None)  # Get sibling's details
+                # Get sibling's details
+                sibling = next((p for p in people if p.get(
+                    'INDI', '') == sibling_id), None)
                 if sibling and 'FAMS' in sibling:
-                    spouse_ids = sibling['FAMS']  # Get IDs of sibling's spouses
+                    # Get IDs of sibling's spouses
+                    spouse_ids = sibling['FAMS']
                     for spouse_id in spouse_ids:
-                        spouse = next((p for p in people if p.get('INDI', '') == spouse_id), None)  # Get spouse's details
-                        if spouse and spouse.get('FAMC', '') == person.get('FAMC', ''):  # Check if spouse is the child
-                            error_message = f"ERROR: INDIVIDUAL: US18: {sibling_id}: Sibling is married to their child {person.get('INDI', '')}."
+                        # Get spouse's details
+                        spouse = next((p for p in people if p.get(
+                            'INDI', '') == spouse_id), None)
+                        # Check if spouse is the child
+                        if spouse and spouse.get('FAMC', '') == person.get('FAMC', ''):
+                            error_message = f"ERROR: INDIVIDUAL: US18: {
+                                sibling_id}: Sibling is married to their child {person.get('INDI', '')}."
                             print(error_message)
                             return False
     return True
+
 
 check_sibling_married_to_child(people, families)
 
 # Sprint 3 -  List Siblings by Age
 
+
 def list_siblings_by_age(people, families):
-    print(f"Siblings Sorted by Age:")
+    print(f"Siblings Sorted by Age: ")
     siblings_by_age = {}  # Dictionary to store siblings grouped by family and ordered by age
 
     for family in families:
         family_id = family.get('FAM', '')
-        children = find_children(family_id)  # Get children for the family using find_children function
+        # Get children for the family using find_children function
+        children = find_children(family_id)
 
         if children:
             # Sort children by age in descending order
             children.sort(key=lambda x: datetime.strptime(
                 x.get('BIRTH', {}).get('BDATE', '01 JAN 1900'), "%d %b %Y"))
 
-            siblings_by_age[family_id] = children  # Add sorted children to the dictionary
+            # Add sorted children to the dictionary
+            siblings_by_age[family_id] = children
 
     # Print siblings grouped by family and ordered by age
     for family_id, siblings in siblings_by_age.items():
@@ -647,7 +663,7 @@ list_siblings_by_age(people, families)
 
 
 def check_unique_name_and_birth(people):
-    name_birth_dict = {} 
+    name_birth_dict = {}
     errors = []
 
     for person in people:
@@ -657,7 +673,8 @@ def check_unique_name_and_birth(people):
         if name and birth_date:
             name_birth_key = (name, birth_date)
             if name_birth_key in name_birth_dict:
-                error_message = f"ERROR: INDIVIDUAL: US23: Duplicate individual found with the same name '{name}' and birthdate '{birth_date}'."
+                error_message = f"ERROR: INDIVIDUAL: US23: Duplicate individual found with the same name '{
+                    name}' and birthdate '{birth_date}'."
                 errors.append(error_message)
             else:
                 name_birth_dict[name_birth_key] = person['INDI']
@@ -667,10 +684,12 @@ def check_unique_name_and_birth(people):
 
     return not errors
 
+
 if check_unique_name_and_birth(people):
     print("No individuals with the same name and birthdate found.")
 else:
     print("Duplicate individuals with the same name and birthdate found.")
+
 
 def check_gender(people, families):
     for family in families:
@@ -678,30 +697,37 @@ def check_gender(people, families):
         wife_id = family.get('WIFE', '')
 
         if husband_id:
-            husband = next((person for person in people if person.get('INDI', '') == husband_id), None)
+            husband = next((person for person in people if person.get(
+                'INDI', '') == husband_id), None)
             if husband:
                 husband_gender = husband.get('SEX', '')
                 if husband_gender != 'M':
-                    error_message = f"ERROR: INDIVIDUAL: US21: {husband_id}: Should be a male."
+                    error_message = f"ERROR: INDIVIDUAL: US21: {
+                        husband_id}: Should be a male."
                     print(error_message)
 
         if wife_id:
-            wife = next((person for person in people if person.get('INDI', '') == wife_id), None)
+            wife = next((person for person in people if person.get(
+                'INDI', '') == wife_id), None)
             if wife:
                 wife_gender = wife.get('SEX', '')
                 if wife_gender != 'F':
-                    error_message = f"ERROR: INDIVIDUAL: US21: {wife_id}: Should be a female."
+                    error_message = f"ERROR: INDIVIDUAL: US21: {
+                        wife_id}: Should be a female."
                     print(error_message)
+
 
 # Call the check_gender function
 check_gender(people, families)
+
 
 def check_siblings_not_married(people, families):
     errors = []
     for family in families:
         husband_id = family.get('HUSB', '')
         wife_id = family.get('WIFE', '')
-        husband = next((p for p in people if p.get('INDI') == husband_id), None)
+        husband = next(
+            (p for p in people if p.get('INDI') == husband_id), None)
         wife = next((p for p in people if p.get('INDI') == wife_id), None)
 
         if husband and wife:
@@ -709,14 +735,17 @@ def check_siblings_not_married(people, families):
             wife_famc = wife.get('FAMC')
 
             if husband_famc and wife_famc and husband_famc == wife_famc:
-                error_message = f"ERROR: FAMILY: US18: {family.get('FAM', '')}: Siblings {husband_id} and {wife_id} are married to each other."
+                error_message = f"ERROR: FAMILY: US18: {family.get('FAM', '')}: Siblings {
+                    husband_id} and {wife_id} are married to each other."
                 errors.append(error_message)
-    
+
     for error in errors:
         print(error)
-    return not errors 
+    return not errors
+
 
 check_siblings_not_married(people, families)
+
 
 def check_unique_ids(individuals, families):
     individual_ids = set()
@@ -725,7 +754,8 @@ def check_unique_ids(individuals, families):
     for individual in individuals:
         indi_id = individual.get('INDI', '')
         if indi_id in individual_ids:
-            error_message = f"ERROR: INDIVIDUAL: US22: Duplicate individual ID {indi_id} found."
+            error_message = f"ERROR: INDIVIDUAL: US22: Duplicate individual ID {
+                indi_id} found."
             print(error_message)
             return False
         individual_ids.add(indi_id)
@@ -733,11 +763,13 @@ def check_unique_ids(individuals, families):
     for family in families:
         fam_id = family.get('FAM', '')
         if fam_id in family_ids:
-            error_message = f"ERROR: FAMILY: US22: Duplicate family ID {fam_id} found."
+            error_message = f"ERROR: FAMILY: US22: Duplicate family ID {
+                fam_id} found."
             print(error_message)
             return False
         family_ids.add(fam_id)
 
     return True
+
 
 check_unique_ids(people, families)

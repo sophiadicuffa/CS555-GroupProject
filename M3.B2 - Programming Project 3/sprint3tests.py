@@ -3,13 +3,11 @@ from unittest.mock import patch
 from datetime import datetime, date
 from io import StringIO
 
-# Import the check_gender function from your FamilyTables module
 from FamilyTables import check_unique_name_and_birth, check_gender, calculate_age, check_siblings_not_married, check_unique_ids, list_siblings_by_age, find_children
 
 class TestFamilyFunctions(unittest.TestCase):
     
     def setUp(self):
-        # Common setup for all tests if necessary
         pass
 
     def test_gender_with_correct_data(self):
