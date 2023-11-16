@@ -773,3 +773,54 @@ def check_unique_ids(individuals, families):
 
 
 check_unique_ids(people, families)
+
+
+def list_living_married_people_to_gedcom(people, families, output_file):
+    with open(output_file, 'w') as gedcom_output:
+        gedcom_output.write("0 HEAD\n")
+        gedcom_output.write("1 SOUR MyGenealogyApp\n")
+        gedcom_output.write("2 VERS 1.0\n")
+        gedcom_output.write("1 GEDC\n")
+        gedcom_output.write("2 FORM LINEAGE-LINKED\n")
+        gedcom_output.write("1 CHAR UTF-8\n")
+
+        for family in families:
+            husband_id = family.get('HUSB', '')
+            wife_id = family.get('WIFE', '')
+            marriage_date_str = family.get('MARR', {}).get('DATE', '')
+
+            if not husband_id or not wife_id or not marriage_date_str:
+                continue
+
+            husband = next((person for person in people if person.get('INDI', '') == husband_id), None)
+            wife = next((person for person in people if person.get('INDI', '') == wife_id), None)
+
+            if husband and wife:
+                current_date = datetime.now().date()
+                marriage_date = datetime.strptime(marriage_date_str, "%d %b %Y").date()
+
+                # Check if both spouses are alive
+                if 'DEATH' not in husband and 'DEATH' not in wife:
+                    # Check if marriage date is in the past
+                    if marriage_date <= current_date:
+                        # Write information to the GEDCOM file
+                        gedcom_output.write(f"0 @{husband_id}@ INDI\n")
+                        gedcom_output.write(f"1 NAME {husband.get('NAME', '')}\n")
+                        gedcom_output.write(f"1 SEX {husband.get('SEX', '')}\n")
+                        gedcom_output.write(f"1 BIRT\n")
+                        gedcom_output.write(f"2 DATE {husband.get('BIRTH', {}).get('BDATE', '')}\n")
+                        gedcom_output.write(f"0 @{wife_id}@ INDI\n")
+                        gedcom_output.write(f"1 NAME {wife.get('NAME', '')}\n")
+                        gedcom_output.write(f"1 SEX {wife.get('SEX', '')}\n")
+                        gedcom_output.write(f"1 BIRT\n")
+                        gedcom_output.write(f"2 DATE {wife.get('BIRTH', {}).get('BDATE', '')}\n")
+                        gedcom_output.write(f"0 @{family.get('FAM', '')}@ FAM\n")
+                        gedcom_output.write(f"1 HUSB @{husband_id}@\n")
+                        gedcom_output.write(f"1 WIFE @{wife_id}@\n")
+                        gedcom_output.write(f"1 MARR\n")
+                        gedcom_output.write(f"2 DATE {marriage_date_str}\n")
+                        gedcom_output.write("0 TRLR\n")
+    print("Living married people are listed in 'living_married_people.ged'")
+
+# Call the function to list living married people to a GEDCOM file
+list_living_married_people_to_gedcom(people, families, 'living_married_people.ged')
