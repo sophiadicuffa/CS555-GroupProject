@@ -824,3 +824,115 @@ def list_living_married_people_to_gedcom(people, families, output_file):
 
 # Call the function to list living married people to a GEDCOM file
 list_living_married_people_to_gedcom(people, families, 'living_married_people.ged')
+
+# Sprint 4
+
+def print_deceased_from_gedcom(gedcom_file_path):
+    people = []
+    current_person = {}
+
+    def process_line(line):
+        nonlocal current_person
+        line = line.strip()
+        parts = line.split()
+        level = int(parts[0])
+        tag = parts[1]
+
+        if len(parts) > 2:
+            special_tag = parts[2]
+        else:
+            special_tag = ''
+
+        if level == 0:
+            if special_tag == 'INDI':
+                if current_person:
+                    people.append(current_person)
+                current_person = {"INDI": tag}
+        elif level == 1:
+            if tag == 'NAME':
+                current_person['NAME'] = ' '.join(parts[2:])
+            elif tag == 'DEAT':
+                current_person['DEATH'] = {}
+        elif level == 2:
+            if 'DEATH' in current_person and tag == 'DATE':
+                current_person['DEATH']['DATE'] = ' '.join(parts[2:])
+
+    try:
+        with open(gedcom_file_path, 'r') as gedcom_file:
+            for line in gedcom_file:
+                process_line(line)
+        if current_person:  
+            people.append(current_person)
+
+        print("\nDeceased Individuals:")
+        for person in people:
+            if 'DEATH' in person and person['DEATH'].get('DATE', ''):
+                name = person.get('NAME', 'Unknown')
+                print(name)
+
+    except FileNotFoundError:
+        print("GEDCOM file not found.")
+
+print_deceased_from_gedcom('test.ged')
+
+def print_upcoming_birthdays(gedcom_file_path):
+    people = []
+    current_person = {}
+
+    def process_line(line):
+        nonlocal current_person
+        line = line.strip()
+        parts = line.split()
+        level = int(parts[0])
+        tag = parts[1]
+
+        if len(parts) > 2:
+            special_tag = parts[2]
+        else:
+            special_tag = ''
+
+        if level == 0:
+            if special_tag == 'INDI':
+                if current_person:
+                    people.append(current_person)
+                current_person = {"INDI": tag}
+        elif level == 1:
+            if tag == 'NAME':
+                current_person['NAME'] = ' '.join(parts[2:])
+            elif tag == 'BIRT':
+                current_person['BIRTH'] = {}
+            elif tag == 'DEAT':
+                current_person['DEATH'] = {}
+        elif level == 2:
+            if 'BIRTH' in current_person and tag == 'DATE':
+                current_person['BIRTH']['DATE'] = ' '.join(parts[2:])
+            elif 'DEATH' in current_person and tag == 'DATE':
+                current_person['DEATH']['DATE'] = ' '.join(parts[2:])
+
+    try:
+        with open(gedcom_file_path, 'r') as gedcom_file:
+            for line in gedcom_file:
+                process_line(line)
+        if current_person:
+            people.append(current_person)
+
+        today = datetime.today()
+        in_30_days = today + timedelta(days=30)
+
+        print("\nUpcoming Birthdays in the Next 30 Days:")
+        for person in people:
+            if 'DEATH' not in person and 'BIRTH' in person and person['BIRTH'].get('DATE', ''):
+                try:
+                    birth_date = datetime.strptime(person['BIRTH']['DATE'], "%d %b %Y").replace(year=today.year)
+                    if birth_date >= today and birth_date <= in_30_days:
+                        name = person.get('NAME', 'Unknown')
+                        print(name)
+                except ValueError:
+                    pass
+
+    except FileNotFoundError:
+        print("GEDCOM file not found.")
+
+print_upcoming_birthdays('path_to_your_gedcom_file.ged')
+
+
