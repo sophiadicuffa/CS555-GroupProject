@@ -2,6 +2,7 @@
 # CS555 M3.B2
 
 from datetime import datetime, date, timedelta
+from dateutil.relativedelta import relativedelta
 
 people = []
 families = []
@@ -817,7 +818,6 @@ list_living_married_people_to_gedcom(people, families, 'living_married_people.ge
 
 # Sprint 4
 
-
 def print_deceased_from_gedcom(gedcom_file_path):
     people = []
     current_person = {}
@@ -951,3 +951,52 @@ print("\nLiving Singles Over 30:")
 for single in living_singles:
     print(f"ID: {single.get('INDI', '')}, Name: {single.get('NAME', '')}, Age: {calculate_age(single.get('BIRTH', {}).get('BDATE', ''), None)}")
 
+def get_marriage_date(family_id, families):
+    marriage_date = next((family.get('MARR', {}).get('DATE', '')
+                         for family in families if family.get('FAM', '') == family_id), '')
+    return datetime.strptime(marriage_date, "%d %b %Y") if marriage_date else None
+
+def get_living_couples(people, families):
+    today = date.today()
+    couples = []
+
+    for family in families:
+        husband_id = family.get('HUSB', '')
+        wife_id = family.get('WIFE', '')
+        marriage_date = get_marriage_date(family.get('FAM', ''), families)
+
+        if not husband_id or not wife_id or not marriage_date:
+            continue
+
+        husband_death_date = get_death_date(husband_id, people)
+        wife_death_date = get_death_date(wife_id, people)
+
+        if (not husband_death_date or today <= husband_death_date) and \
+           (not wife_death_date or today <= wife_death_date):
+            couples.append({
+                'Husband': next((person.get('NAME', '') for person in people if person.get('INDI', '') == husband_id), ''),
+                'Wife': next((person.get('NAME', '') for person in people if person.get('INDI', '') == wife_id), ''),
+                'MarriageDate': marriage_date
+            })
+
+    return couples
+
+def upcoming_anniversaries(people, families):
+    today = date.today()
+    thirty_days_later = today + relativedelta(days=30)
+
+    couples = get_living_couples(people, families)
+
+    upcoming_anniversaries = [couple for couple in couples
+                              if today <= couple['MarriageDate'] <= thirty_days_later]
+
+    if upcoming_anniversaries:
+        print("\nUpcoming Marriage Anniversaries (Next 30 Days):")
+        print("{:<20} {:<20} {:<20}".format("Husband", "Wife", "Marriage Date"))
+        for couple in upcoming_anniversaries:
+            print("{:<20} {:<20} {:<20}".format(
+                couple['Husband'], couple['Wife'], couple['MarriageDate'].strftime("%d %b %Y")))
+    else:
+        print("\nNo upcoming marriage anniversaries in the next 30 days.")
+
+upcoming_anniversaries(people, families)

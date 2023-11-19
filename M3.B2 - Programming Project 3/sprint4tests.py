@@ -4,7 +4,7 @@ from datetime import datetime, date
 from io import StringIO
 
 # Import the check_gender function from your FamilyTables module
-from FamilyTables import validate_date_format, living_single, print_upcoming_birthdays, parse_date, print_deceased_from_gedcom
+from FamilyTables import get_living_couples, validate_date_format, living_single, print_upcoming_birthdays, parse_date, print_deceased_from_gedcom
 
 class TestFamilyFunctions(unittest.TestCase):
     #testing validate_date_format
@@ -42,6 +42,22 @@ class TestFamilyFunctions(unittest.TestCase):
         ]
         result = living_single(people)
         self.assertEqual(len(result), 0)
+
+    def test_get_living_couples(self):
+        people = [
+            {'INDI': 'I1', 'NAME': 'John Doe', 'SEX': 'M', 'BIRTH': {'BDATE': '01 JAN 1980'}},
+            {'INDI': 'I2', 'NAME': 'Jane Doe', 'SEX': 'F', 'BIRTH': {'BDATE': '15 FEB 1985'}},
+        ]
+        families = [
+            {'FAM': 'F1', 'HUSB': 'I1', 'WIFE': 'I2', 'MARR': {'DATE': '01 JAN 2000'}},
+        ]
+
+        # Test for living couples
+        couples = get_living_couples(people, families)
+        self.assertEqual(len(couples), 1)
+        self.assertEqual(couples[0]['Husband'], 'John Doe')
+        self.assertEqual(couples[0]['Wife'], 'Jane Doe')
+        self.assertEqual(couples[0]['MarriageDate'].strftime("%d %b %Y"), '01 Jan 2000')
 
   
 
